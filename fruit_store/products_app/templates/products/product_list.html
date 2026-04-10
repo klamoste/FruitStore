@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - Fruit Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-0">
+                        <div class="mb-3">
+                            <label for="q" class="form-label">Search Products</label>
+                            <input type="text" name="q" id="q" class="form-control" value="{{ query }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select name="category" id="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                    <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == category_id %}selected{% endif %}>{{ cat.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="min_price" class="form-label">Min Price (₱)</label>
+                            <input type="number" name="min_price" id="min_price" class="form-control" step="0.01" style="-moz-appearance: textfield; appearance: textfield;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="max_price" class="form-label">Max Price (₱)</label>
+                            <input type="number" name="max_price" id="max_price" class="form-control" step="0.01" style="-moz-appearance: textfield; appearance: textfield;">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success w-100">Filter</button>
+                        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary w-100 mt-2">Reset</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products Grid -->
+        <div class="col-md-9">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="text-success">🍎 Fresh Fruits</h2>
+                    {% if query %}
+                        <p class="text-muted">Search results for: <strong>{{ query }}</strong></p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if products %}
+                <div class="row g-4">
+                    {% for product in products %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card h-100 shadow-sm product-card" style="transition: transform 0.2s;">
+                                <div class="card-img-top position-relative" style="height: 200px; overflow: hidden;">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-100 h-100 object-fit-cover">
+                                    {% else %}
+                                        <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
+                                            <span class="text-muted">No image</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if product.stock_quantity < 5 %}
+                                        <span class="badge bg-danger position-absolute top-0 end-0 m-2">Low Stock</span>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product.name }}</h5>
+                                    <p class="card-text text-muted" style="height: 60px; overflow: hidden;">{{ product.description|truncatewords:15 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h4 class="text-success mb-0">₱{{ product.price }}</h4>
+                                        <small class="text-muted">{{ product.unit }}</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <a href="{% url 'products:product_detail' product.id %}" class="btn btn-outline-success btn-sm w-100">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if products.has_other_pages %}
+                    <nav aria-label="Page navigation" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            {% if products.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}">First</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}">Previous</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+                            </li>
+                            
+                            {% if products.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}">Next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if category_id %}&category={{ category_id }}{% endif %}">Last</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <h4>No products found</h4>
+                    <p>Try adjusting your filters or search terms.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+</style>
+{% endblock %}

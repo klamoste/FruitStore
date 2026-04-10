@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - FruitShop{% endblock %}
+
+{% block content %}
+<div class="container-xl" style="padding: 3rem 0;">
+    {% if not user.is_staff %}
+    <div style="background: #fee; border: 1px solid #fcc; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2rem; color: #c33;">
+        <i class="fas fa-lock"></i> Access Denied - Admin privileges required.
+    </div>
+    {% else %}
+    <h1 style="font-weight: 700; margin-bottom: 2rem; color: #1a1a1a;">Dashboard</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="row" style="margin-bottom: 3rem;">
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; border-top: 4px solid var(--primary-green);">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart" style="font-size: 2rem; color: var(--primary-green); margin-bottom: 1rem; display: block;"></i>
+                    <p style="color: #999; margin: 0; font-size: 0.9rem;">Total Orders</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0.5rem 0 0; color: #1a1a1a;">{{ total_orders }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; border-top: 4px solid var(--light-green);">
+                <div class="card-body">
+                    <i class="fas fa-money-bill-wave" style="font-size: 2rem; color: var(--light-green); margin-bottom: 1rem; display: block;"></i>
+                    <p style="color: #999; margin: 0; font-size: 0.9rem;">Total Revenue</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0.5rem 0 0; color: #1a1a1a;">₱{{ total_revenue }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; border-top: 4px solid #ffc107;">
+                <div class="card-body">
+                    <i class="fas fa-cubes" style="font-size: 2rem; color: #ffc107; margin-bottom: 1rem; display: block;"></i>
+                    <p style="color: #999; margin: 0; font-size: 0.9rem;">Total Products</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0.5rem 0 0; color: #1a1a1a;">{{ total_products }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; border-top: 4px solid #17a2b8;">
+                <div class="card-body">
+                    <i class="fas fa-users" style="font-size: 2rem; color: #17a2b8; margin-bottom: 1rem; display: block;"></i>
+                    <p style="color: #999; margin: 0; font-size: 0.9rem;">Total Users</p>
+                    <h3 style="font-size: 2rem; font-weight: 700; margin: 0.5rem 0 0; color: #1a1a1a;">{{ total_users }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+                <div class="card-body">
+                    <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">Recent Orders</h4>
+                    
+                    {% if recent_orders %}
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eee;">
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Order ID</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Customer</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Amount</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 1rem; font-weight: 600;">#{{ order.id }}</td>
+                                    <td style="padding: 1rem;">{{ order.first_name }} {{ order.last_name }}</td>
+                                    <td style="padding: 1rem; font-weight: 600; color: var(--primary-green);">₱{{ order.total_amount }}</td>
+                                    <td style="padding: 1rem;">
+                                        <span style="background: var(--light-green); color: white; padding: 0.3rem 0.7rem; border-radius: 15px; font-size: 0.85rem;">
+                                            {{ order.status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="color: #999; text-align: center; padding: 2rem 0;">No orders yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inventory Alerts -->
+        <div class="col-lg-4 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+                <div class="card-body">
+                    <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">Low Stock Items</h4>
+                    
+                    {% if low_stock_products %}
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        {% for product in low_stock_products %}
+                        <div style="padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 0.5rem;">
+                            <p style="margin: 0; font-weight: 600; color: #856404;">{{ product.name }}</p>
+                            <p style="margin: 0.25rem 0 0; color: #856404; font-size: 0.9rem;">Stock: {{ product.stock }} units</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p style="color: #999; text-align: center; padding: 2rem 0;">All products well stocked</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% endif %}
+</div>
+{% endblock %}

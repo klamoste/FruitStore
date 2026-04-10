@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - FruitShop{% endblock %}
+
+{% block content %}
+<div class="container-xl" style="padding: 3rem 0;">
+    <h1 style="font-weight: 700; margin-bottom: 2rem; color: #1a1a1a;">Shopping Cart</h1>
+    
+    {% if cart_items %}
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-lg-8 mb-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div style="display: flex; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;" class="cart-item">
+                        <img src="https://images.unsplash.com/photo-1599599810694-5ac4dd0485f?w=150&h=150&fit=crop" 
+                             style="width: 120px; height: 120px; border-radius: 0.5rem; object-fit: cover;">
+                        
+                        <div style="flex: 1;">
+                            <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.product.name }}</h5>
+                            <p style="color: #999; margin-bottom: 1rem;">{{ item.product.category.name }}</p>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; gap: 1rem; align-items: center;">
+                                    <span style="color: #666;">Quantity:</span>
+                                    <form method="post" action="{% url 'orders:update_cart' item.product.id %}" style="display: flex; gap: 0.5rem; align-items: center;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="update">
+                                        <button type="button" onclick="const q=this.nextElementSibling; if(q && parseInt(q.value) > 1){ q.value = parseInt(q.value) - 1; this.form.submit(); }" style="width: 36px; height: 36px; border: 1px solid #ddd; background: #fff; color: #444; border-radius: 0.35rem; cursor: pointer; font-size: 1rem;">
+                                            −
+                                        </button>
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" onchange="this.form.submit()" 
+                                               style="width: 60px; padding: 0.4rem; border: 1px solid #ddd; border-radius: 0.3rem; -moz-appearance: textfield; appearance: textfield; text-align: center;">
+                                        <button type="button" onclick="const q=this.previousElementSibling; q.value = parseInt(q.value) + 1; this.form.submit();" style="width: 36px; height: 36px; border: 1px solid #ddd; background: #fff; color: #444; border-radius: 0.35rem; cursor: pointer; font-size: 1rem;">
+                                            +
+                                        </button>
+                                    </form>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-green);">₱{{ item.subtotal }}</div>
+                                    <div style="color: #999; font-size: 0.85rem;">₱{{ item.product.price }} / kg</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form method="post" action="{% url 'orders:update_cart' item.product.id %}" style="align-self: center;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="remove">
+                            <button type="submit" style="background: none; border: none; color: #e74c3c; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 1.2rem;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; position: sticky; top: 100px;">
+                <div class="card-body">
+                    <h5 style="font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem;">Order Summary</h5>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: #666;">Subtotal</span>
+                            <span style="font-weight: 600;">₱{{ total_price }}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: #666;">Shipping</span>
+                            <span style="font-weight: 600;">Free</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <span style="font-weight: 700; font-size: 1.1rem;">Total</span>
+                        <span style="font-size: 1.8rem; font-weight: 700; color: var(--primary-green);">₱{{ final_total }}</span>
+                    </div>
+                    
+                    <a href="{% url 'orders:checkout' %}" class="btn-primary-custom" style="width: 100%; justify-content: center; padding: 0.8rem; margin-bottom: 1rem; font-size: 1.05rem;">
+                        Proceed to Checkout
+                    </a>
+                    
+                    <a href="{% url 'products:product_list' %}" style="display: block; text-align: center; color: var(--primary-green); text-decoration: none; font-weight: 600; padding: 0.8rem; border: 2px solid var(--primary-green); border-radius: 0.5rem;">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem 2rem; background: var(--light-bg); border-radius: 1rem;">
+        <i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ddd; margin-bottom: 1rem; display: block;"></i>
+        <h3 style="color: #999; margin-bottom: 1rem;">Your Cart is Empty</h3>
+        <p style="color: #ccc; margin-bottom: 2rem;">Start adding some fresh fruits to your cart</p>
+        <a href="{% url 'products:product_list' %}" class="btn-primary-custom">
+            Start Shopping
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

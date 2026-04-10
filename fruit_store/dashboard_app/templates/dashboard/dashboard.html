@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Fruit Store{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <h1 class="text-success mb-4">📊 Admin Dashboard</h1>
+    
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Orders</h6>
+                    <h2 class="text-success">{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Revenue</h6>
+                    <h2 class="text-success">₱{{ total_revenue }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted">Items Sold</h6>
+                    <h2 class="text-success">{{ total_items_sold }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h6 class="text-muted">Avg Order Value</h6>
+                    <h2 class="text-success">₱{{ total_revenue|floatformat:2|default:"0.00" }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Status -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Order Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <h4 class="text-warning">{{ pending_orders }}</h4>
+                            <p>Pending Orders</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-info">{{ paid_orders }}</h4>
+                            <p>Paid Orders</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-primary">{{ shipped_orders }}</h4>
+                            <p>Shipped Orders</p>
+                        </div>
+                        <div class="col-md-3">
+                            <h4 class="text-success">{{ delivered_orders }}</h4>
+                            <p>Delivered Orders</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Best Sellers -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">🏆 Best Selling Products</h5>
+                </div>
+                <div class="card-body">
+                    {% if best_sellers %}
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in best_sellers %}
+                                    <tr>
+                                        <td>{{ item.product.name }}</td>
+                                        <td><span class="badge bg-success">{{ item.total_sold }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No sales data yet</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Low Stock Alert -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">⚠️ Low Stock Alert</h5>
+                </div>
+                <div class="card-body">
+                    {% if low_stock_products %}
+                        <table class="table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in low_stock_products %}
+                                    <tr class="{% if product.stock_quantity == 0 %}table-danger{% else %}table-warning{% endif %}">
+                                        <td>{{ product.name }}</td>
+                                        <td><strong>{{ product.stock_quantity }}</strong></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-success">All products have sufficient stock!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/" class="btn btn-success me-2">Manage Products</a>
+                    <a href="/admin/orders_app/order/" class="btn btn-success me-2">View Orders</a>
+                    <a href="/admin/accounts_app/profile/" class="btn btn-success me-2">Manage Users</a>
+                    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">Back to Store</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - Fruit Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-panel {
+        border-radius: 1.8rem;
+        box-shadow: 0 30px 70px rgba(11, 40, 18, 0.08);
+        overflow: hidden;
+    }
+    .profile-banner {
+        background: linear-gradient(135deg, rgba(45,122,90,0.12), rgba(45,122,90,0.03));
+        padding: 2rem 2.5rem;
+        border-bottom: 1px solid #e9efe8;
+    }
+    .profile-banner .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: var(--primary-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 2rem;
+        box-shadow: 0 12px 30px rgba(45,122,90,0.18);
+    }
+    .profile-title {
+        font-size: 2.4rem;
+        font-weight: 800;
+        margin-bottom: 0.3rem;
+    }
+    .profile-subtitle {
+        color: #5f6e65;
+        margin-bottom: 0.65rem;
+        font-size: 0.98rem;
+    }
+    .profile-label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #4e5a53;
+    }
+    .profile-meta {
+        color: #6d7a6f;
+        font-size: 0.95rem;
+    }
+    .profile-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(45,122,90,0.12);
+        color: var(--primary-green);
+        font-weight: 700;
+        font-size: 0.92rem;
+        border: 1px solid rgba(45,122,90,0.18);
+    }
+    .profile-actions .btn {
+        min-width: 145px;
+        border-radius: 0.95rem;
+        font-weight: 700;
+        padding: 0.92rem 1.4rem;
+    }
+    .profile-actions .btn-outline-success {
+        color: var(--primary-green);
+        border-color: rgba(45,122,90,0.22);
+    }
+    .info-card,
+    .stats-card,
+    .edit-card {
+        border: none;
+        border-radius: 1.4rem;
+        box-shadow: 0 18px 40px rgba(11, 40, 18, 0.06);
+    }
+    .info-card .card-body,
+    .stats-card .card-body,
+    .edit-card .card-body {
+        padding: 1.9rem;
+    }
+    .section-title {
+        font-size: 1rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--primary-green);
+        margin-bottom: 1.25rem;
+    }
+    .detail-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .detail-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid #ecf3ed;
+    }
+    .detail-list li:last-child {
+        border-bottom: none;
+    }
+    .detail-key {
+        color: #6d7a6f;
+        font-size: 0.95rem;
+    }
+    .detail-value {
+        font-weight: 700;
+        color: #22372b;
+        text-align: right;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    .stat-item {
+        background: #eff8f1;
+        border-radius: 1.05rem;
+        padding: 1.15rem 1.1rem;
+        text-align: center;
+        min-height: 120px;
+    }
+    .stat-item h3 {
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: var(--primary-green);
+        margin-bottom: 0.4rem;
+    }
+    .stat-item p {
+        margin: 0;
+        color: #607264;
+        font-size: 0.96rem;
+    }
+    .profile-form .form-control,
+    .profile-form .form-control:focus {
+        border-radius: 0.85rem;
+        box-shadow: none;
+        border: 1px solid #d9e3da;
+    }
+    .input-group-text {
+        border-left: none;
+        background: transparent;
+        color: #2ba955;
+        font-size: 1.1rem;
+    }
+    .profile-form .form-text {
+        color: #6d7a6f;
+    }
+    .summary-note {
+        background: #f4fbf6;
+        border: 1px solid #ddf0df;
+        border-radius: 1rem;
+        padding: 1.3rem 1.4rem;
+        color: #5d725d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    @media (max-width: 991px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .profile-banner {
+            text-align: center;
+        }
+        .profile-banner .profile-avatar {
+            margin: 0 auto;
+        }
+        .profile-actions {
+            justify-content: center;
+        }
+        .profile-actions .btn {
+            min-width: 180px;
+        }
+    }
+    @media (max-width: 767px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        .profile-panel {
+            margin: 0 0.5rem;
+        }
+        .profile-banner {
+            padding: 1.5rem 1.3rem;
+        }
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+        .profile-actions .btn {
+            width: 100%;
+            min-width: unset;
+        }
+        .info-card .card-body,
+        .stats-card .card-body,
+        .edit-card .card-body {
+            padding: 1.3rem;
+        }
+        .section-title {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-10">
+            <div class="card profile-panel border-0">
+                <div class="profile-banner">
+                    <div class="row align-items-center gx-4">
+                        <div class="col-md-8 d-flex align-items-center gap-4">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h2 class="profile-title">{{ user.first_name|default:user.username }} {{ user.last_name }}</h2>
+                                <p class="profile-subtitle">Member since {{ user.date_joined|date:"F d, Y" }}</p>
+                                <span class="profile-chip">Customer</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0 profile-actions">
+                            <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success">View Orders</a>
+                            <a href="{% url 'accounts:logout' %}" class="btn btn-danger">Logout</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-xl-5">
+                    <div class="row gy-4">
+                        <div class="col-xl-4">
+                            <div class="card info-card mb-4">
+                                <div class="card-body">
+                                    <div class="section-title">Profile Summary</div>
+                                    <ul class="detail-list">
+                                        <li><span class="detail-key">Full Name</span><span class="detail-value">{{ user.get_full_name|default:user.username }}</span></li>
+                                        <li><span class="detail-key">Username</span><span class="detail-value">{{ user.username }}</span></li>
+                                        <li><span class="detail-key">Email</span><span class="detail-value">{{ user.email }}</span></li>
+                                        <li><span class="detail-key">Role</span><span class="detail-value">{{ profile.get_role_display }}</span></li>
+                                        <li><span class="detail-key">Status</span><span class="detail-value">{{ user.is_active|yesno:"Active,Inactive" }}</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card info-card mb-4">
+                                <div class="card-body">
+                                    <div class="section-title">Contact Details</div>
+                                    <ul class="detail-list">
+                                        <li><span class="detail-key">Phone</span><span class="detail-value">{{ profile.contact_number|default:'Not set' }}</span></li>
+                                        <li><span class="detail-key">Address</span><span class="detail-value">{{ profile.address|default:'Not set' }}</span></li>
+                                        <li><span class="detail-key">City</span><span class="detail-value">{{ profile.city|default:'-' }}, {{ profile.state|default:'-' }}</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="section-title">Account Metrics</div>
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <h3>{{ order_count }}</h3>
+                                            <p>Total Orders</p>
+                                        </div>
+                                        <div class="stat-item">
+                                            <h3>₱{{ total_spent|floatformat:2 }}</h3>
+                                            <p>Total Spent</p>
+                                        </div>
+                                        <div class="stat-item">
+                                            <h3>{{ user.date_joined|timesince }}</h3>
+                                            <p>Member For</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-8">
+                            <div class="card edit-card mb-4">
+                                <div class="card-body">
+                                    <div class="section-title">Edit Profile</div>
+                                    <p class="profile-meta">Update your personal information and security settings below.</p>
+
+                                    <form method="post" novalidate class="profile-form">
+                                        {% csrf_token %}
+                                        <div class="row g-3 mt-2">
+                                            <div class="col-md-6">
+                                                <label for="id_username" class="form-label profile-label">Username</label>
+                                                {{ form.username }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="id_first_name" class="form-label profile-label">First Name</label>
+                                                {{ form.first_name }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="id_last_name" class="form-label profile-label">Last Name</label>
+                                                {{ form.last_name }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="id_email" class="form-label profile-label">Email Address</label>
+                                                <div class="input-group">
+                                                    {{ form.email }}
+                                                    <span class="input-group-text"><i class="fas fa-check-circle"></i></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label profile-label">Account Status</label>
+                                                <div class="form-control" style="background: #f3faf6; border-color: #d7f1de; color: #1f5540;">{{ user.is_active|yesno:"Active,Inactive" }}</div>
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="id_address" class="form-label profile-label">Address</label>
+                                                {{ form.address }}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="id_contact_number" class="form-label profile-label">Contact Number</label>
+                                                {{ form.contact_number }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="id_city" class="form-label profile-label">City</label>
+                                                {{ form.city }}
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="id_state" class="form-label profile-label">State</label>
+                                                {{ form.state }}
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="id_password" class="form-label profile-label">Password</label>
+                                                {{ form.password }}
+                                                <div class="form-text">Leave blank to keep your current password.</div>
+                                            </div>
+                                        </div>
+
+                                        {% if form.errors %}
+                                        <div class="alert alert-danger mt-4">
+                                            Please fix the errors in the form.
+                                        </div>
+                                        {% endif %}
+
+                                        <div class="mt-4 d-flex flex-column flex-sm-row gap-3 profile-actions">
+                                            <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-cancel">Cancel</a>
+                                            <button type="submit" class="btn btn-save">Save Changes</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="card info-card">
+                                <div class="card-body">
+                                    <div class="section-title">Profile Insights</div>
+                                    <p class="profile-meta">Your account information is used across shopping, checkout, and order tracking. Keeping these details accurate helps ensure a smooth delivery experience.</p>
+                                    <ul class="text-muted mb-0" style="padding-left: 1.2rem;">
+                                        <li>Make sure your email is current for order notifications.</li>
+                                        <li>Use a valid phone number so our delivery team can reach you.</li>
+                                        <li>Update your address to receive fresh fruit deliveries on time.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

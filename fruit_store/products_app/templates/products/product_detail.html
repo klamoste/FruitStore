@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Fruit Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'products:product_list' %}?category={{ product.category.id }}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="card-img-top" style="height: 400px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+                        <span class="text-muted">No image available</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Product Details -->
+        <div class="col-md-7">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title text-success">{{ product.name }}</h1>
+                    
+                    <div class="mb-3">
+                        <p><strong>Category:</strong> <span class="badge bg-info">{{ product.category.name }}</span></p>
+                        <p><strong>Unit:</strong> {{ product.get_unit_display }}</p>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">₱{{ product.price }}</h2>
+                    
+                    <div class="alert {% if product.stock_quantity > 10 %}alert-success{% elif product.stock_quantity > 0 %}alert-warning{% else %}alert-danger{% endif %}">
+                        {% if product.stock_quantity > 10 %}
+                            ✅ In Stock ({{ product.stock_quantity }} available)
+                        {% elif product.stock_quantity > 0 %}
+                            ⚠️ Low Stock ({{ product.stock_quantity }} remaining)
+                        {% else %}
+                            ❌ Out of Stock
+                        {% endif %}
+                    </div>
+                    
+                    <h4 class="mt-4">Description</h4>
+                    <p class="text-muted">{{ product.description }}</p>
+                    
+                    {% if product.is_available and product.stock_quantity > 0 %}
+                        <form method="post" action="{% url 'products:add_to_cart' product.id %}" class="mt-4">
+                            {% csrf_token %}
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="quantity" class="form-label">Quantity:</label>
+                                    {{ form.quantity }}
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                        </form>
+                    {% else %}
+                        <button class="btn btn-danger btn-lg" disabled>Out of Stock</button>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">← Back to Products</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="text-success mb-4">More from {{ product.category.name }}</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}

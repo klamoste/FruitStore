@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - FruitShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-page {
+        padding: 4rem 0;
+    }
+    .checkout-card {
+        border: none;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+        border-radius: 1.75rem;
+        overflow: hidden;
+    }
+    .checkout-card .card-header {
+        background: #fff;
+        border: none;
+        padding: 2rem 2.5rem;
+    }
+    .checkout-card .card-body {
+        padding: 2.5rem;
+    }
+    .checkout-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.75rem;
+    }
+    .checkout-hero h1 {
+        font-size: 2.6rem;
+        font-weight: 800;
+        margin: 0;
+        line-height: 1.05;
+    }
+    .checkout-hero p {
+        color: #5f5f5f;
+        font-size: 1rem;
+        margin: 0.85rem 0 0;
+        max-width: 44rem;
+    }
+    .checkout-hero .badge {
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        padding: 0.9rem 1.2rem;
+        border-radius: 999px;
+    }
+    .payment-options {
+        display: grid;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .payment-option {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.3rem 1.2rem;
+        border-radius: 1rem;
+        border: 1px solid #e8efe8;
+        background: #f8fbf8;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+        cursor: pointer;
+    }
+    .payment-option:hover {
+        border-color: rgba(45, 122, 90, 0.35);
+        transform: translateY(-1px);
+    }
+    .payment-option input[type="radio"] {
+        accent-color: var(--primary-green);
+        width: 1.2rem;
+        height: 1.2rem;
+        margin: 0;
+        flex-shrink: 0;
+    }
+    .payment-option-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .payment-option-title {
+        font-weight: 700;
+        color: #1f5540;
+        margin-bottom: 0.25rem;
+        font-size: 1.05rem;
+    }
+    .payment-option-description {
+        color: #5f6e60;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+    .place-order-btn {
+        padding: 1.1rem 1.4rem;
+        font-size: 1rem;
+        border-radius: 1rem;
+    }
+    .order-summary {
+        border-radius: 1.75rem;
+        border: 1px solid #e7ece9;
+        padding: 2rem;
+        background: #ffffff;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.06);
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.4rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid #f0f2f0;
+    }
+    .summary-item-title {
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+    }
+    .summary-item-meta {
+        color: #6f7d72;
+        font-size: 0.95rem;
+    }
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 2px solid #e7ece9;
+        margin-top: 1.5rem;
+    }
+    .summary-total strong {
+        font-size: 1.25rem;
+    }
+    .summary-total-value {
+        font-size: 1.8rem;
+        color: var(--primary-green);
+        font-weight: 800;
+    }
+    .checkout-note {
+        font-size: 0.95rem;
+        color: #7b8a7c;
+        margin-top: 1.5rem;
+        line-height: 1.7;
+    }
+    @media (max-width: 991px) {
+        .checkout-hero {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .order-summary {
+            position: static !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-xl checkout-page">
+    <div class="row gx-4 gy-4">
+        <div class="col-lg-8">
+            <div class="card checkout-card">
+                <div class="card-header">
+                    <div class="checkout-hero">
+                        <div>
+                            <span class="text-success fw-semibold text-uppercase" style="letter-spacing: 0.12em; font-size: 0.85rem;">Checkout</span>
+                            <h1>Complete your order</h1>
+                            <p>Choose your preferred payment method and confirm your fresh fruit order.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="fw-bold text-success mb-3">Payment Method</h4>
+                    <p class="text-muted mb-4">Select how you want to pay. You can change this before placing the order.</p>
+
+                    <form method="post" id="checkoutForm">
+                        {% csrf_token %}
+                        <div class="payment-options">
+                            {% for radio in form.payment_method %}
+                            <label class="payment-option">
+                                {{ radio.tag }}
+                                <div class="payment-option-content">
+                                    <div class="payment-option-title">{{ radio.choice_label }}</div>
+                                    <div class="payment-option-description">
+                                        {% if radio.choice_value == 'COD' %}
+                                            Pay cash when your fruits are delivered to your door.
+                                        {% else %}
+                                            Use GCash to pay quickly and securely.
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-success place-order-btn w-100">
+                            Place Order <i class="fas fa-check ms-2"></i>
+                        </button>
+                    </form>
+
+                    <p class="checkout-note">You will receive order confirmation by email after placing the order. Shipping is free and your fruits are packed fresh for delivery.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="order-summary position-sticky" style="top: 100px;">
+                <h5 class="fw-bold mb-4">Order Summary</h5>
+                {% for item in cart_items %}
+                <div class="summary-item">
+                    <div>
+                        <div class="summary-item-title">{{ item.product.name }}</div>
+                        <div class="summary-item-meta">Qty: {{ item.quantity }}</div>
+                    </div>
+                    <div class="fw-bold text-success">₱{{ item.subtotal }}</div>
+                </div>
+                {% endfor %}
+
+                <div class="summary-item">
+                    <div class="summary-item-meta">Subtotal</div>
+                    <div class="fw-semibold">₱{{ total_price }}</div>
+                </div>
+                <div class="summary-item mb-0">
+                    <div class="summary-item-meta">Shipping</div>
+                    <div class="fw-semibold">Free</div>
+                </div>
+
+                <div class="summary-total">
+                    <strong>Total</strong>
+                    <span class="summary-total-value">₱{{ final_total }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

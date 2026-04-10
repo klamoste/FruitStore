@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} - FruitShop{% endblock %}
+
+{% block content %}
+<div class="container-xl" style="padding: 3rem 0;">
+    <a href="{% url 'orders:order_history' %}" style="color: var(--primary-green); text-decoration: none; font-weight: 600; margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-arrow-left"></i> Back to Orders
+    </a>
+    
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <!-- Order Info -->
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem; margin-bottom: 2rem;">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid #eee;">
+                        <div>
+                            <h2 style="font-weight: 700; margin: 0; color: #1a1a1a;">Order #{{ order.id }}</h2>
+                            <p style="color: #999; margin: 0.5rem 0 0;">{{ order.created_at|date:"M d, Y H:i" }}</p>
+                        </div>
+                        <span style="background: var(--light-green); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.95rem; font-weight: 600;">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                    
+                    <!-- Order Items -->
+                    <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">Order Items</h4>
+                    {% for item in items %}
+                    <div style="display: flex; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
+                        <img src="https://images.unsplash.com/photo-1599599810694-5ac4dd0485f?w=100&h=100&fit=crop" 
+                             style="width: 100px; height: 100px; border-radius: 0.5rem; object-fit: cover;">
+                        
+                        <div style="flex: 1;">
+                            <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.product.name }}</h5>
+                            <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">{{ item.product.category.name }}</p>
+                            
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: #666;">Qty: <strong>{{ item.quantity }}</strong></span>
+                                <span style="color: #666;">Price: <strong>₱{{ item.product.price }}</strong></span>
+                                <span style="font-weight: 700; color: var(--primary-green); font-size: 1.1rem;">₱{{ item.subtotal }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary -->
+        <div class="col-lg-4">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+                <div class="card-body">
+                    <h5 style="font-weight: 700; margin-bottom: 1.5rem; font-size: 1.3rem;">Order Summary</h5>
+                    
+                    <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <span style="color: #666;">Total</span>
+                            <span style="font-weight: 600;">₱{{ order.total_price }}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #eee;">
+                        <h6 style="font-weight: 700; margin-bottom: 1rem; color: var(--primary-green);">Order Timeline</h6>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <div style="width: 40px; height: 40px; background: var(--light-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-check" style="color: white;"></i>
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-weight: 600;">Order Placed</p>
+                                <p style="margin: 0.25rem 0 0; color: #999; font-size: 0.9rem;">{{ order.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

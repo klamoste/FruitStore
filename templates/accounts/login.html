@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Login - FruitShop{% endblock %}
+
+{% block content %}
+<div class="container-xl" style="padding: 3rem 0;">
+    <div style="max-width: 450px; margin: 0 auto;">
+        <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+            <div class="card-body" style="padding: 2.5rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <i class="fas fa-sign-in-alt" style="font-size: 3rem; color: var(--primary-green); margin-bottom: 1rem; display: block;"></i>
+                    <h2 style="font-weight: 700; margin: 0; color: #1a1a1a;">Welcome Back</h2>
+                    <p style="color: #999; margin: 0.5rem 0 0;">Sign in to your FruitShop account</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Username</label>
+                        {{ form.username }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Password</label>
+                        {{ form.password }}
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div style="background: #fee; border: 1px solid #fcc; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; color: #c33;">
+                        <p style="margin: 0;">Invalid username or password</p>
+                    </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn-primary-custom" style="width: 100%; justify-content: center; padding: 0.9rem; font-size: 1.05rem;">
+                        Sign In
+                    </button>
+                    
+                    <p style="text-align: center; color: #999; margin: 1.5rem 0 0;">
+                        Don't have an account? <a href="{% url 'accounts:register' %}" style="color: var(--primary-green); text-decoration: none; font-weight: 600;">Register here</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+    
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(45, 122, 90, 0.1);
+    }
+</style>
+{% endblock %}
