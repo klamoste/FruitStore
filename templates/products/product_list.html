@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Our Fresh Fruits - FruitShop{% endblock %}
+{% block title %}Our Fresh Fruits - SOFIA'S FRUIT STORE{% endblock %}
 
 {% block content %}
 <div class="container-xl" style="padding: 3rem 0;">
@@ -10,7 +10,7 @@
             <p style="color: #666; font-size: 1rem; margin: 0;">{{ products|length }} products available</p>
         </div>
         <form method="get" class="d-flex align-items-center gap-2" style="width: 100%; max-width: 420px;">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..." 
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..."
                    style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #ddd; border-radius: 999px; background: #fff; color: #333; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);">
             <button type="submit" class="btn-primary-custom" style="padding: 0.85rem 1.5rem; border-radius: 999px;">Search</button>
         </form>
@@ -20,8 +20,8 @@
         {% if products %}
             {% for product in products %}
             <div class="col-sm-6 col-xl-3">
-                <div class="card h-100" style="border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;" 
-                     onmouseover="this.style.transform='translateY(-7px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.12)';" 
+                <div class="card h-100" style="border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;"
+                     onmouseover="this.style.transform='translateY(-7px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.12)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.08)';">
                     <div style="position: relative; overflow: hidden; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
                         {% if product.image %}
@@ -36,8 +36,7 @@
                         <p style="color: #777; font-size: 0.95rem; line-height: 1.5; min-height: 60px; margin-bottom: 1.4rem;">{{ product.description|truncatewords:12 }}</p>
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
                             <div>
-                                <div style="font-size: 1.35rem; font-weight: 700; color: var(--primary-green);">₱{{ product.price }} / kg</div>
-                                <div style="color: #999; font-size: 0.85rem; margin-top: 0.35rem;">Starting at 0.5 kg · {{ product.stock_quantity }} kg available</div>
+                                <div style="font-size: 1.35rem; font-weight: 700; color: var(--primary-green);">&#8369;{{ product.price }} / kg</div>
                             </div>
                             <form method="post" action="{% url 'products:add_to_cart' product.id %}" style="margin: 0;">
                                 {% csrf_token %}

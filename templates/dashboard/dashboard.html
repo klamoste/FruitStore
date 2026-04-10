@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - FruitShop{% endblock %}
+{% block title %}Admin Dashboard - SOFIA'S FRUIT STORE{% endblock %}
 
 {% block content %}
 <div class="container-xl" style="padding: 3rem 0;">
@@ -112,6 +112,64 @@
                     </div>
                     {% else %}
                     <p style="color: #999; text-align: center; padding: 2rem 0;">All products well stocked</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 1rem;">
+                <div class="card-body">
+                    <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">All User Information</h4>
+
+                    {% if users %}
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eee;">
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Username</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Name</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Email</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Role</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Contact</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Address</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Orders</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Total Spent</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Staff</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Superuser</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Joined</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Last Login</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for account in users %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 1rem; font-weight: 600;">{{ account.username }}</td>
+                                    <td style="padding: 1rem;">{{ account.full_name }}</td>
+                                    <td style="padding: 1rem;">{{ account.email }}</td>
+                                    <td style="padding: 1rem;">{{ account.role }}</td>
+                                    <td style="padding: 1rem;">{{ account.contact_number }}</td>
+                                    <td style="padding: 1rem;">
+                                        {{ account.address }}
+                                        {% if account.city or account.state %}
+                                        <div style="font-size: 0.85rem; color: #777; margin-top: 0.35rem;">{{ account.city }} {{ account.state }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 1rem;">{{ account.order_count }}</td>
+                                    <td style="padding: 1rem; font-weight: 600; color: var(--primary-green);">₱{{ account.total_spent|floatformat:2 }}</td>
+                                    <td style="padding: 1rem;">{{ account.is_staff|yesno:"Yes,No" }}</td>
+                                    <td style="padding: 1rem;">{{ account.is_superuser|yesno:"Yes,No" }}</td>
+                                    <td style="padding: 1rem;">{{ account.date_joined|date:"Y-m-d H:i" }}</td>
+                                    <td style="padding: 1rem;">{{ account.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p style="color: #999; text-align: center; padding: 2rem 0; margin: 0;">No users found</p>
                     {% endif %}
                 </div>
             </div>
