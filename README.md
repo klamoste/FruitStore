@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🍎 Fruit Store - Django E-Commerce System
 
 A complete production-ready fruit store inventory and e-commerce system built with Django, featuring user authentication, product management, shopping cart, and order processing.
@@ -355,3 +356,7 @@ For issues or questions, check the Django documentation:
 **Version**: 1.0.0  
 **Last Updated**: April 2026  
 **Status**: Production Ready ✅
+=======
+# FruitStore
+fruits
+>>>>>>> b6c7887870a81fa809195598fca7fe2e91de99b3
