@@ -129,7 +129,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Authentication
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'products:product_list'
+LOGIN_REDIRECT_URL = 'products:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
 # Default primary key field type

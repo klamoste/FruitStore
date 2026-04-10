@@ -10,7 +10,7 @@ from .models import Profile
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect('products:product_list')
+        return redirect('products:home')
     
     if request.method == 'POST':
         form = RegisterForm(request.POST)
@@ -31,7 +31,7 @@ def register(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('products:product_list')
+        return redirect('products:home')
     
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -39,7 +39,7 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, f'Welcome back, {user.username}!')
-            next_url = request.GET.get('next', 'products:product_list')
+            next_url = request.GET.get('next', 'products:home')
             return redirect(next_url)
     else:
         form = LoginForm()

@@ -5,7 +5,23 @@ from django.core.paginator import Paginator
 from .models import Order, OrderItem
 from .forms import CheckoutForm, PaymentForm
 from products_app.models import Product, InventoryLog
+from accounts_app.models import Profile
 from decimal import Decimal
+
+
+def has_complete_profile(user):
+    profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'customer'})
+    required_user_fields = [
+        user.first_name,
+        user.last_name,
+        user.email,
+    ]
+    required_profile_fields = [
+        profile.address,
+        profile.contact_number,
+        profile.city,
+    ]
+    return all(value and str(value).strip() for value in required_user_fields + required_profile_fields)
 
 
 @login_required(login_url='accounts:login')
@@ -36,6 +52,7 @@ def view_cart(request):
         'total_price': total_price,
         'final_total': total_price.quantize(Decimal('0.01')),
         'item_count': sum(item['quantity'] for item in cart_items),
+        'profile_complete': has_complete_profile(request.user),
     }
     return render(request, 'orders/cart.html', context)
 
@@ -77,11 +94,18 @@ def update_cart(request, product_id):
 def checkout(request):
     """Checkout form to create order."""
     cart = request.session.get('cart', {})
-    
+
     if not cart:
         messages.error(request, 'Your cart is empty.')
         return redirect('products:product_list')
-    
+
+    if not has_complete_profile(request.user):
+        messages.warning(
+            request,
+            'Please complete your profile and contact information before placing an order.'
+        )
+        return redirect('accounts:profile')
+
     # Calculate total and prepare cart items
     total_price = Decimal('0.00')
     cart_items = []
