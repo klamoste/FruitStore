@@ -18,3 +18,15 @@ class PaymentForm(forms.Form):
         choices=PAYMENT_CHOICES,
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
+    customer_note = forms.CharField(
+        required=False,
+        max_length=500,
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Add delivery notes, preferred handling instructions, or any message for your order.',
+            }
+        ),
+        label='Order Note',
+    )

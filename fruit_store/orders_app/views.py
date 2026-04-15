@@ -2,26 +2,31 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import transaction
 from .models import Order, OrderItem
 from .forms import CheckoutForm, PaymentForm
 from products_app.models import Product, InventoryLog
 from accounts_app.models import Profile
 from decimal import Decimal
 
+SHIPPING_FEE = Decimal('50.00')
+
+
+def get_missing_profile_fields(user):
+    profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'customer'})
+    checks = [
+        ('first name', user.first_name),
+        ('last name', user.last_name),
+        ('email', user.email),
+        ('address', profile.address),
+        ('contact number', profile.contact_number),
+        ('city', profile.city),
+    ]
+    return [label for label, value in checks if not (value and str(value).strip())]
+
 
 def has_complete_profile(user):
-    profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'customer'})
-    required_user_fields = [
-        user.first_name,
-        user.last_name,
-        user.email,
-    ]
-    required_profile_fields = [
-        profile.address,
-        profile.contact_number,
-        profile.city,
-    ]
-    return all(value and str(value).strip() for value in required_user_fields + required_profile_fields)
+    return not get_missing_profile_fields(user)
 
 
 @login_required(login_url='accounts:login')
@@ -49,8 +54,9 @@ def view_cart(request):
     
     context = {
         'cart_items': cart_items,
-        'total_price': total_price,
-        'final_total': total_price.quantize(Decimal('0.01')),
+        'subtotal_price': total_price,
+        'shipping_fee': SHIPPING_FEE,
+        'final_total': (total_price + SHIPPING_FEE).quantize(Decimal('0.01')),
         'item_count': sum(item['quantity'] for item in cart_items),
         'profile_complete': has_complete_profile(request.user),
     }
@@ -100,9 +106,11 @@ def checkout(request):
         return redirect('products:product_list')
 
     if not has_complete_profile(request.user):
+        missing_fields = get_missing_profile_fields(request.user)
         messages.warning(
             request,
-            'Please complete your profile and contact information before placing an order.'
+            'Please complete your profile before placing an order. Missing: '
+            + ', '.join(missing_fields) + '.'
         )
         return redirect('accounts:profile')
 
@@ -120,15 +128,19 @@ def checkout(request):
             'subtotal': subtotal,
         })
     
+    final_total = (total_price + SHIPPING_FEE).quantize(Decimal('0.01'))
+
     if request.method == 'POST':
         form = PaymentForm(request.POST)
         if form.is_valid():
             payment_method = form.cleaned_data['payment_method']
+            customer_note = form.cleaned_data['customer_note']
             
             # Create order
             order = Order.objects.create(
                 user=request.user,
-                total_price=total_price,
+                customer_note=customer_note,
+                total_price=final_total,
                 status='paid' if payment_method == 'PAID' else 'pending'
             )
             
@@ -160,16 +172,14 @@ def checkout(request):
             request.session['cart'] = {}
             request.session.modified = True
             
-            messages.success(request, f'Order placed successfully! Order ID: {order.id}')
             return redirect('orders:order_detail', order_id=order.id)
     else:
         form = PaymentForm()
     
-    final_total = total_price.quantize(Decimal('0.01'))
-    
     context = {
         'form': form,
-        'total_price': total_price,
+        'subtotal_price': total_price,
+        'shipping_fee': SHIPPING_FEE,
         'final_total': final_total,
         'cart_items': cart_items,
         'item_count': sum(item['quantity'] for item in cart_items),
@@ -195,9 +205,39 @@ def order_detail(request, order_id):
     """Display single order details."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
     items = OrderItem.objects.filter(order=order)
+    subtotal_price = sum((item.subtotal for item in items), Decimal('0.00'))
     
     context = {
         'order': order,
         'items': items,
+        'subtotal_price': subtotal_price,
+        'shipping_fee': SHIPPING_FEE,
     }
     return render(request, 'orders/order_detail.html', context)
+
+
+@login_required(login_url='accounts:login')
+@transaction.atomic
+def cancel_order(request, order_id):
+    if request.method != 'POST':
+        return redirect('orders:order_detail', order_id=order_id)
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    if not order.can_cancel:
+        messages.error(request, 'This order can no longer be cancelled.')
+        return redirect('orders:order_detail', order_id=order.id)
+
+    for item in OrderItem.objects.select_related('product').filter(order=order):
+        product = item.product
+        product.stock_quantity += item.quantity
+        product.save(update_fields=['stock_quantity'])
+        InventoryLog.objects.create(
+            product=product,
+            change=item.quantity,
+            reason='restock'
+        )
+
+    order.status = 'cancelled'
+    order.save(update_fields=['status', 'updated_at'])
+    messages.success(request, f'Order {order.order_code} has been cancelled.')
+    return redirect('orders:order_detail', order_id=order.id)
