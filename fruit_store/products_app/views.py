@@ -2,7 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db import DatabaseError
 from django.db.models import Q
+from django.http import JsonResponse
 from .models import Product, Category, InventoryLog
 from .forms import ProductSearchForm, AddToCartForm
 from orders_app.models import Order, OrderItem
@@ -10,7 +12,14 @@ from orders_app.models import Order, OrderItem
 
 def home(request):
     """Display home page with hero section and featured products."""
-    featured_products = Product.objects.filter(is_available=True)[:8]
+    try:
+        featured_products = Product.objects.filter(is_available=True).order_by('-created_at')[:8]
+    except DatabaseError:
+        featured_products = []
+        messages.warning(
+            request,
+            'Products are temporarily unavailable while the catalog database is being set up.'
+        )
     
     context = {
         'featured_products': featured_products,
@@ -20,34 +29,39 @@ def home(request):
 
 def product_list(request):
     """Display all products with search and filter functionality."""
-    products = Product.objects.filter(is_available=True)
-    categories = Category.objects.all()
-    
-    # Search
     query = request.GET.get('q', '')
-    if query:
-        products = products.filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query)
-        )
-    
-    # Filter by category
     category_id = request.GET.get('category', '')
-    if category_id:
-        products = products.filter(category_id=category_id)
-    
-    # Filter by price
-    min_price = request.GET.get('min_price', '')
-    max_price = request.GET.get('max_price', '')
-    if min_price:
-        products = products.filter(price__gte=min_price)
-    if max_price:
-        products = products.filter(price__lte=max_price)
-    
-    # Pagination
-    paginator = Paginator(products, 12)
-    page = request.GET.get('page', 1)
-    products = paginator.get_page(page)
+
+    try:
+        products = Product.objects.filter(is_available=True).order_by('name')
+        categories = Category.objects.all().order_by('name')
+        
+        if query:
+            products = products.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query)
+            )
+        
+        if category_id:
+            products = products.filter(category_id=category_id)
+        
+        min_price = request.GET.get('min_price', '')
+        max_price = request.GET.get('max_price', '')
+        if min_price:
+            products = products.filter(price__gte=min_price)
+        if max_price:
+            products = products.filter(price__lte=max_price)
+        
+        paginator = Paginator(products, 12)
+        page = request.GET.get('page', 1)
+        products = paginator.get_page(page)
+    except DatabaseError:
+        products = []
+        categories = []
+        messages.error(
+            request,
+            'The product catalog is temporarily unavailable. Please try again after the database is configured.'
+        )
     
     context = {
         'products': products,
@@ -60,7 +74,15 @@ def product_list(request):
 
 def product_detail(request, pk):
     """Display a single product details."""
-    product = get_object_or_404(Product, pk=pk)
+    try:
+        product = get_object_or_404(Product, pk=pk)
+    except DatabaseError:
+        messages.error(
+            request,
+            'This product is temporarily unavailable because the catalog database is not ready.'
+        )
+        return redirect('products:product_list')
+
     form = AddToCartForm()
     
     context = {
@@ -73,7 +95,14 @@ def product_detail(request, pk):
 @login_required(login_url='accounts:login')
 def add_to_cart(request, pk):
     """Add product to shopping cart (stored in session)."""
-    product = get_object_or_404(Product, pk=pk)
+    try:
+        product = get_object_or_404(Product, pk=pk)
+    except DatabaseError:
+        messages.error(
+            request,
+            'Your cart is temporarily unavailable because the product database is not ready.'
+        )
+        return redirect('products:product_list')
     
     if request.method == 'POST':
         form = AddToCartForm(request.POST)
@@ -105,16 +134,18 @@ def add_to_cart(request, pk):
 def search_products(request):
     """AJAX search for products."""
     query = request.GET.get('q', '')
-    products = Product.objects.filter(
-        is_available=True,
-        name__icontains=query
-    )[:5]
-    
-    results = [{
-        'id': p.id,
-        'name': p.name,
-        'price': str(p.price),
-    } for p in products]
-    
-    import json
-    return json.dumps(results)
+    try:
+        products = Product.objects.filter(
+            is_available=True,
+            name__icontains=query
+        ).order_by('name')[:5]
+
+        results = [{
+            'id': p.id,
+            'name': p.name,
+            'price': str(p.price),
+        } for p in products]
+    except DatabaseError:
+        results = []
+
+    return JsonResponse(results, safe=False)

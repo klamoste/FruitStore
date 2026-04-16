@@ -1,44 +1,47 @@
 #!/bin/bash
-# Quick Start Script for Fruit Store
+set -e
 
-echo "🍎 Fruit Store - Quick Start Setup"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$SCRIPT_DIR/fruit_store"
+
+echo "Fruit Store - Quick Start Setup"
 echo "===================================="
-echo ""
+echo
 
-# Navigate to project directory
-cd c:\INVE\fruit_store\fruit_store
+cd "$PROJECT_DIR"
 
 echo "Step 1: Installing dependencies..."
-pip install -r ../requirements.txt > /dev/null 2>&1
-echo "✅ Dependencies installed"
-echo ""
+python -m pip install -r "$SCRIPT_DIR/requirements.txt"
+echo "Dependencies installed"
+echo
 
 echo "Step 2: Running migrations..."
-python manage.py migrate --noinput > /dev/null 2>&1
-echo "✅ Database initialized"
-echo ""
+python manage.py migrate --noinput
+echo "Database initialized"
+echo
 
 echo "Step 3: Creating sample data..."
-python manage.py create_sample_data > /dev/null 2>&1
-echo "✅ Sample categories and products created"
-echo ""
+python manage.py create_sample_data
+echo "Sample categories and products created"
+echo
 
 echo "Step 4: Collecting static files..."
-python manage.py collectstatic --noinput > /dev/null 2>&1
-echo "✅ Static files collected"
-echo ""
+python manage.py collectstatic --noinput
+echo "Static files collected"
+echo
 
 echo "===================================="
-echo "🎉 Setup Complete!"
-echo ""
+echo "Setup Complete!"
+echo
 echo "Test Credentials:"
 echo "  Admin:    admin / admin123"
 echo "  Customer: testuser / testuser123"
-echo ""
+echo
 echo "To start the server, run:"
+echo "  cd \"$PROJECT_DIR\""
 echo "  python manage.py runserver"
-echo ""
+echo
 echo "Then visit: http://127.0.0.1:8000/"
 echo "Admin panel: http://127.0.0.1:8000/admin/"
-echo ""
+echo
 echo "===================================="
