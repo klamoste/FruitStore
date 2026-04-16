@@ -116,6 +116,31 @@
         .navbar-icon:hover {
             color: var(--light-green);
         }
+        .logout-form {
+            margin: 0;
+        }
+        .logout-link {
+            background: none;
+            border: none;
+            color: #666 !important;
+            font-weight: 500;
+            margin: 0 0.5rem;
+            padding: 0.5rem 0;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .logout-link:hover {
+            color: var(--primary-green) !important;
+        }
+        footer .logout-link {
+            color: #999 !important;
+            margin: 0;
+            padding: 0;
+            font-weight: 400;
+        }
+        footer .logout-link:hover {
+            color: var(--primary-green) !important;
+        }
         
         .user-profile {
             display: flex;
@@ -297,6 +322,14 @@
         
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.15rem;
+                max-width: calc(100vw - 6rem);
+                line-height: 1.2;
+            }
+            .navbar-brand i {
+                font-size: 1.25rem;
+            }
             .hero-heading {
                 font-size: 2.5rem;
             }
@@ -309,10 +342,26 @@
             .navbar-collapse {
                 margin-top: 1rem;
             }
+            .navbar-nav {
+                align-items: stretch;
+            }
             
             .nav-link {
                 padding: 0.5rem 0 !important;
                 border-bottom: 1px solid #eee;
+                margin: 0;
+                display: block;
+                width: 100%;
+                text-align: left;
+            }
+            .logout-form,
+            .logout-link {
+                width: 100%;
+                text-align: left;
+            }
+            footer {
+                margin-top: 2.5rem;
+                padding-top: 2.25rem;
             }
         }
     </style>
@@ -353,7 +402,10 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+                        <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-link logout-link" onclick="return confirmLogout();">Logout</button>
+                        </form>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -364,18 +416,6 @@
             </div>
         </div>
     </nav>
-    
-    <!-- ===== MESSAGES ===== -->
-    <div class="container-xl">
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-    </div>
     
     <!-- ===== CONTENT ===== -->
     {% block content %}{% endblock %}
@@ -391,7 +431,6 @@
                 <div class="col-md-3 mb-4">
                     <h5>Shop</h5>
                     <ul>
-                        <li><a href="{% url 'products:product_list' %}">All Products</a></li>
                         <li><a href="{% url 'products:product_list' %}?category=1">Fresh Fruits</a></li>
                         <li><a href="{% url 'orders:cart' %}">Shopping Cart</a></li>
                     </ul>
@@ -402,7 +441,12 @@
                         {% if user.is_authenticated %}
                         <li><a href="{% url 'accounts:profile' %}">My Profile</a></li>
                         <li><a href="{% url 'orders:order_history' %}">My Orders</a></li>
-                        <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                        <li>
+                            <form method="post" action="{% url 'accounts:logout' %}" class="logout-form">
+                                {% csrf_token %}
+                                <button type="submit" class="logout-link" onclick="return confirmLogout();">Logout</button>
+                            </form>
+                        </li>
                         {% else %}
                         <li><a href="{% url 'accounts:register' %}">Register</a></li>
                         <li><a href="{% url 'accounts:login' %}">Login</a></li>
@@ -413,6 +457,7 @@
                     <h5>Contact</h5>
                     <ul>
                         <li><i class="fas fa-phone"></i> 09213382336</li>
+                        <li><i class="fas fa-envelope"></i> sofiasfruitstore@gmail.com</li>
                         <li><i class="fas fa-map-marker-alt"></i> Cor. Carlota and Naldoza St., Purok Quezon, Poblacion Bacuag, Surigao del Norte</li>
                     </ul>
                 </div>
@@ -425,6 +470,11 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmLogout() {
+            return confirm('Are you sure you want to log out?');
+        }
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

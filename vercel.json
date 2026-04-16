@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd fruit_store && python manage.py collectstatic --noinput",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
+  ]
+}

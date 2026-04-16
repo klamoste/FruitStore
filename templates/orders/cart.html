@@ -16,10 +16,11 @@
                     <div style="display: flex; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;" class="cart-item">
                         {% if item.product.image %}
                         <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}"
-                             style="width: 120px; height: 120px; border-radius: 0.5rem; object-fit: cover;">
+                             onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22%3E%3Crect width=%22120%22 height=%22120%22 rx=%2216%22 fill=%22%23eef6ef%22/%3E%3Cpath d=%22M24 79l22-22 15 15 14-17 21 24%22 fill=%22none%22 stroke=%22%232f7d5b%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241%22 cy=%2240%22 r=%229%22 fill=%22%23f3b63f%22/%3E%3Ctext x=%2260%22 y=%22104%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2212%22 fill=%22%232f7d5b%22%3EFruit%3C/text%3E%3C/svg%3E';"
+                             style="width: 120px; height: 120px; border-radius: 0.5rem; object-fit: cover; background: #eef6ef;">
                         {% else %}
-                        <img src="https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80" alt="{{ item.product.name }}"
-                             style="width: 120px; height: 120px; border-radius: 0.5rem; object-fit: cover;">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='16' fill='%23eef6ef'/%3E%3Cpath d='M24 79l22-22 15 15 14-17 21 24' fill='none' stroke='%232f7d5b' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='41' cy='40' r='9' fill='%23f3b63f'/%3E%3Ctext x='60' y='104' text-anchor='middle' font-family='Arial,sans-serif' font-size='12' fill='%232f7d5b'%3EFruit%3C/text%3E%3C/svg%3E" alt="{{ item.product.name }}"
+                             style="width: 120px; height: 120px; border-radius: 0.5rem; object-fit: cover; background: #eef6ef;">
                         {% endif %}
                         
                         <div style="flex: 1;">
@@ -72,11 +73,11 @@
                     <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #eee;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                             <span style="color: #666;">Subtotal</span>
-                            <span style="font-weight: 600;">&#8369;{{ total_price }}</span>
+                            <span style="font-weight: 600;">&#8369;{{ subtotal_price }}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
                             <span style="color: #666;">Shipping</span>
-                            <span style="font-weight: 600;">Free</span>
+                            <span style="font-weight: 600;">&#8369;{{ shipping_fee }}</span>
                         </div>
                     </div>
                     

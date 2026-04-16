@@ -16,8 +16,9 @@
                 <div class="card-body">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                         <div>
-                            <h5 style="font-weight: 700; margin-bottom: 0.5rem;">Order #{{ order.id }}</h5>
-                            <p style="color: #999; margin: 0; font-size: 0.9rem;">{{ order.created_at|date:"M d, Y" }}</p>
+                            <h5 style="font-weight: 700; margin-bottom: 0.35rem;">{{ order.order_code }}</h5>
+                            <p style="color: #999; margin: 0; font-size: 0.9rem;">Placed {{ order.created_at|date:"M d, Y" }}</p>
+                            <p style="color: #999; margin: 0.3rem 0 0; font-size: 0.85rem;">Internal ref: #{{ order.id }}</p>
                         </div>
                         <span style="background: var(--light-green); color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
                             {{ order.status|upper }}
@@ -29,6 +30,9 @@
                             <div>
                                 <p style="color: #999; margin: 0; font-size: 0.9rem;">Items: {{ order.orderitem_set.count }}</p>
                                 <p style="color: #999; margin: 0; font-size: 0.9rem;">Status: {{ order.get_status_display }}</p>
+                                {% if order.customer_note %}
+                                <p style="color: #999; margin: 0.35rem 0 0; font-size: 0.85rem;">Note: {{ order.customer_note|truncatechars:55 }}</p>
+                                {% endif %}
                             </div>
                             <div style="text-align: right;">
                                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-green);">₱{{ order.total_price }}</div>
@@ -36,11 +40,23 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <a href="{% url 'orders:order_detail' order.id %}" class="btn-primary-custom" style="width: 100%; justify-content: center; padding: 0.75rem;">
-                        View Details
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
+
+                    {% if order.can_cancel %}
+                    <p style="color: #a46b00; font-size: 0.88rem; margin-bottom: 1rem;">You can cancel this order until {{ order.cancel_deadline|date:"M d, Y H:i" }}.</p>
+                    {% endif %}
+
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        {% if order.can_cancel %}
+                        <form method="post" action="{% url 'orders:cancel_order' order.id %}" style="margin: 0; flex: 1 1 180px;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" style="width: 100%; padding: 0.75rem;" onclick="return confirm('Cancel this order? This will restock the items and cannot be undone from your account.');">Cancel the Order</button>
+                        </form>
+                        {% endif %}
+                        <a href="{% url 'orders:order_detail' order.id %}" class="btn-primary-custom" style="flex: 1 1 180px; justify-content: center; padding: 0.75rem;">
+                            View Details
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

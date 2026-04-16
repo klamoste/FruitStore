@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}My Profile - SOFIA'S FRUIT STORE{% endblock %}
 
@@ -14,22 +14,40 @@
         border: none;
     }
     .profile-header {
-        background: linear-gradient(135deg, rgba(45,122,90,0.14), rgba(255,255,255,0.95));
-        padding: 2rem 2.5rem;
-        border-bottom: 1px solid rgba(45,122,90,0.16);
+        background:
+            radial-gradient(circle at top right, rgba(143, 214, 148, 0.18), transparent 36%),
+            linear-gradient(135deg, rgba(45,122,90,0.14), rgba(255,255,255,0.97));
+        padding: 2.2rem 2.5rem;
+        border-bottom: 1px solid rgba(45,122,90,0.12);
+    }
+    .profile-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .profile-identity {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex: 1 1 auto;
+        min-width: 0;
     }
     .profile-avatar {
-        width: 96px;
-        height: 96px;
+        width: 110px;
+        height: 110px;
         border-radius: 50%;
-        background: var(--primary-green);
+        background: linear-gradient(135deg, #2d7a5a, #6abb72);
         display: flex;
         align-items: center;
         justify-content: center;
         color: #fff;
-        font-size: 2.25rem;
-        box-shadow: 0 14px 28px rgba(45,122,90,0.14);
+        font-size: 2.4rem;
+        box-shadow: 0 18px 38px rgba(45,122,90,0.18);
         overflow: hidden;
+        border: 4px solid rgba(255,255,255,0.72);
+        flex-shrink: 0;
+        position: relative;
     }
     .profile-avatar img {
         width: 100%;
@@ -37,26 +55,150 @@
         object-fit: cover;
         display: block;
     }
+    .profile-avatar.leaf {
+        background: linear-gradient(135deg, #2d7a5a, #8fd694);
+    }
+    .profile-avatar.basket {
+        background: linear-gradient(135deg, #9a5b24, #d39c5c);
+    }
+    .profile-avatar.sun {
+        background: linear-gradient(135deg, #f39c12, #f7d774);
+    }
+    .profile-avatar.berry {
+        background: linear-gradient(135deg, #b3396b, #f08ab4);
+    }
     .profile-title {
-        font-size: 2rem;
+        font-size: clamp(2rem, 4vw, 2.6rem);
         font-weight: 800;
-        margin-bottom: 0.35rem;
+        line-height: 1;
+        margin-bottom: 0.45rem;
         color: #1b3e2a;
     }
-    .profile-subtitle {
-        color: #5c6f61;
+    .profile-copy {
+        min-width: 0;
+    }
+    .profile-tools {
+        margin-left: auto;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-end;
+        flex-shrink: 0;
+    }
+    .settings-toggle {
+        width: 50px;
+        height: 36px;
+        border-radius: 10px;
+        border: 2px solid rgba(31, 41, 55, 0.18);
+        background: rgba(255,255,255,0.96);
+        color: #5b6168;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    }
+    .settings-toggle:hover,
+    .settings-toggle:focus {
+        color: #3f454c;
+        background: #fff;
+    }
+    .settings-toggle::after {
+        display: none;
+    }
+    .settings-toggle-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .settings-toggle-bars span {
+        display: block;
+        width: 22px;
+        height: 3px;
+        border-radius: 999px;
+        background: currentColor;
+    }
+    .settings-menu {
+        min-width: 220px;
+        border: 1px solid #e4ece6;
+        border-radius: 1rem;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.12);
+        padding: 0.75rem;
+    }
+    .settings-menu-title {
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--primary-green);
         margin-bottom: 0.65rem;
+    }
+    .settings-menu .btn,
+    .settings-menu .dropdown-item {
+        border-radius: 0.8rem;
+        font-weight: 700;
+    }
+    .settings-menu .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.8rem 0.9rem;
+        color: #294235;
+    }
+    .settings-menu .dropdown-item:hover,
+    .settings-menu .dropdown-item:focus {
+        background: #f3faf5;
+        color: var(--accent-green);
+    }
+    .settings-menu .btn-danger {
+        width: 100%;
+        margin-top: 0.65rem;
+        border: none;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    .settings-menu-warning {
+        background: #fff1f2;
+        border: 1px solid #fecdd3;
+        color: #9f1239;
+        border-radius: 0.85rem;
+        padding: 0.8rem 0.9rem;
+        font-size: 0.9rem;
+        line-height: 1.45;
+        margin-top: 0.2rem;
+    }
+    .profile-meta-list {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.55rem;
+        margin-bottom: 0;
+    }
+    .profile-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        color: #4d6256;
+        font-size: 0.95rem;
+        background: rgba(255,255,255,0.68);
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid rgba(45,122,90,0.12);
+        backdrop-filter: blur(8px);
+    }
+    .profile-meta-item i {
+        color: var(--primary-green);
+        font-size: 0.85rem;
     }
     .profile-badge {
         display: inline-flex;
         align-items: center;
+        gap: 0.45rem;
         padding: 0.55rem 0.95rem;
         border-radius: 999px;
-        background: rgba(45,122,90,0.12);
+        background: rgba(45,122,90,0.1);
         color: var(--primary-green);
         font-weight: 700;
         font-size: 0.92rem;
         border: 1px solid rgba(45,122,90,0.18);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
     }
     .profile-actions {
         display: flex;
@@ -64,14 +206,22 @@
         flex-wrap: wrap;
     }
     .profile-actions .btn {
-        min-width: 150px;
-        border-radius: 0.95rem;
+        min-width: 160px;
+        border-radius: 999px;
         font-weight: 700;
-        padding: 0.9rem 1.25rem;
+        padding: 0.9rem 1.35rem;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+    }
+    .profile-actions .btn-outline-success {
+        background: rgba(255,255,255,0.78);
+        border-color: rgba(45,122,90,0.28);
+    }
+    .profile-actions .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        border: none;
     }
     .info-panel,
     .stats-panel,
-    .details-panel,
     .edit-panel,
     .note-panel {
         border-radius: 1.25rem;
@@ -112,6 +262,71 @@
         color: #213323;
         text-align: right;
     }
+    .summary-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .summary-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 0.88rem;
+    }
+    .summary-badge.complete {
+        background: #e9f8ee;
+        color: #1f7a42;
+        border: 1px solid #bde4c8;
+    }
+    .summary-badge.incomplete {
+        background: #fff7e8;
+        color: #a16207;
+        border: 1px solid #f3d28d;
+    }
+    .summary-progress {
+        margin-bottom: 1.15rem;
+    }
+    .summary-progress-copy {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        color: #5f7063;
+        font-size: 0.92rem;
+        margin-bottom: 0.55rem;
+    }
+    .summary-progress-bar {
+        height: 10px;
+        background: #edf5ef;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .summary-progress-value {
+        height: 100%;
+        background: linear-gradient(135deg, #2d7a5a, #7dc48c);
+        border-radius: 999px;
+    }
+    .summary-missing {
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 1rem;
+        background: #fffdf5;
+        border: 1px solid #f4e4a8;
+        color: #7c5a00;
+    }
+    .summary-missing strong {
+        display: block;
+        margin-bottom: 0.35rem;
+        color: #6d4c00;
+    }
+    .summary-missing-list {
+        margin: 0;
+    }
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -138,19 +353,173 @@
         border: 1px solid #d9e3db;
         box-shadow: none;
     }
+    .profile-form .form-control:focus {
+        border-color: rgba(45,122,90,0.55);
+        box-shadow: 0 0 0 0.2rem rgba(45,122,90,0.12);
+    }
+    .profile-form label {
+        font-weight: 700;
+        color: #284330;
+        margin-bottom: 0.45rem;
+    }
+    .profile-form .input-group-text {
+        border-radius: 0.85rem 0 0 0.85rem;
+        border: 1px solid #d9e3db;
+        border-right: none;
+        background: #f5faf5;
+        color: #4b6955;
+    }
+    .profile-form .input-group .form-control {
+        border-radius: 0 0.85rem 0.85rem 0;
+    }
+    .form-card-copy {
+        color: #647267;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    .form-actions {
+        display: flex;
+        gap: 0.85rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+    .form-actions .btn {
+        min-width: 160px;
+        border-radius: 0.9rem;
+        font-weight: 700;
+        padding: 0.85rem 1.25rem;
+    }
+    .profile-help-list {
+        display: grid;
+        gap: 0.8rem;
+    }
+    .profile-help-item {
+        background: #fff;
+        border: 1px solid #e0eee2;
+        border-radius: 1rem;
+        padding: 1rem 1.1rem;
+    }
+    .profile-help-item strong {
+        display: block;
+        color: #1f3b27;
+        margin-bottom: 0.3rem;
+    }
+    .avatar-studio {
+        background: linear-gradient(180deg, #f7fbf7, #ffffff);
+        border: 1px solid #e3efe4;
+        border-radius: 1rem;
+        padding: 1.15rem;
+        margin-bottom: 1.5rem;
+    }
+    .avatar-studio-preview {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .avatar-studio-copy {
+        color: #657567;
+        margin: 0;
+        line-height: 1.55;
+    }
+    .avatar-choices {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    .avatar-choice {
+        border: 1px solid #dfebe1;
+        border-radius: 1rem;
+        padding: 0.9rem 0.6rem;
+        text-align: center;
+        background: #fff;
+    }
+    .avatar-choice .mini-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        margin: 0 auto 0.65rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.25rem;
+    }
+    .avatar-choice span {
+        font-size: 0.88rem;
+        color: #506253;
+        font-weight: 700;
+    }
     .profile-form .form-text {
         color: #6b7b6d;
+    }
+    .avatar-editor {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1rem 1.1rem;
+        border: 1px solid #dfeadf;
+        border-radius: 1rem;
+        background: #f9fcf9;
+        margin-bottom: 1.5rem;
+    }
+    .avatar-editor-copy {
+        flex: 1 1 auto;
+    }
+    .avatar-editor-title {
+        font-weight: 800;
+        color: #21402d;
+        margin-bottom: 0.25rem;
+    }
+    .avatar-editor-copy p {
+        margin: 0 0 0.75rem 0;
+        color: #647267;
+    }
+    .avatar-editor .form-control {
+        max-width: 320px;
+    }
+    .avatar-preview {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(255,255,255,0.85);
+        box-shadow: 0 10px 24px rgba(45,122,90,0.14);
+        background: linear-gradient(135deg, #2d7a5a, #8fd694);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        flex-shrink: 0;
+    }
+    .avatar-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
     }
     .note-panel {
         background: #f6fdf6;
         border: 1px solid #ddf0df;
     }
     @media (max-width: 991px) {
+        .profile-hero {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .profile-identity {
+            align-items: flex-start;
+        }
+        .profile-tools {
+            margin-left: 0;
+            justify-content: flex-start;
+        }
         .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .profile-actions {
-            justify-content: center;
+            justify-content: flex-start;
         }
         .profile-actions .btn {
             flex: 1 1 auto;
@@ -162,19 +531,43 @@
         }
         .profile-header {
             padding: 1.5rem 1.5rem;
+        }
+        .profile-identity {
+            flex-direction: column;
             text-align: center;
+            align-items: center;
+        }
+        .profile-copy {
+            width: 100%;
+        }
+        .profile-meta-list {
+            align-items: center;
+        }
+        .profile-tools {
+            justify-content: center;
         }
         .profile-actions {
             width: 100%;
             flex-direction: column;
             gap: 0.75rem;
         }
+        .avatar-editor {
+            flex-direction: column;
+            align-items: flex-start;
+        }
         .profile-actions .btn {
             width: 100%;
             min-width: unset;
         }
+        .profile-actions form,
+        .profile-actions button {
+            width: 100%;
+        }
         .stats-grid {
             grid-template-columns: 1fr;
+        }
+        .avatar-choices {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .detail-row {
             flex-direction: column;
@@ -196,50 +589,204 @@
         <div class="col-xl-10">
             <div class="card profile-card">
                 <div class="profile-header">
-                    <div class="row align-items-center gy-4">
-                        <div class="col-lg-6 col-md-7">
-                            <div class="d-flex align-items-start gap-3 mb-4">
-                                <div class="profile-avatar">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <div>
-                                    <h2 class="profile-title">{{ user.get_full_name|default:user.username }}</h2>
-                                    <p class="profile-subtitle">Joined {{ user.date_joined|date:"F d, Y" }}</p>
-                                    <span class="profile-badge">{{ profile.get_role_display }}</span>
+                    <div class="profile-hero">
+                        <div class="profile-identity">
+                            <div class="profile-avatar {{ profile.avatar_template|default:'leaf' }}">
+                                {% if profile.avatar_mode == 'upload' and profile.profile_image %}
+                                    <img id="profileAvatarImage" src="{{ profile.profile_image.url }}" alt="{{ user.username }} profile image">
+                                {% elif profile.avatar_template == 'basket' %}
+                                    <i class="fas fa-basket-shopping"></i>
+                                {% elif profile.avatar_template == 'sun' %}
+                                    <i class="fas fa-sun"></i>
+                                {% elif profile.avatar_template == 'berry' %}
+                                    <i class="fas fa-seedling"></i>
+                                {% else %}
+                                    <i class="fas fa-leaf"></i>
+                                {% endif %}
+                            </div>
+                            <div class="profile-copy">
+                                <h2 class="profile-title">{{ user.username }}</h2>
+                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <span class="profile-badge">
+                                        <i class="fas fa-user-tag"></i>
+                                        {{ profile.get_role_display }}
+                                        </span>
+                                        <div class="profile-actions">
+                                            <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success">View Orders</a>
                                 </div>
                             </div>
-                            <div class="profile-actions">
-                                <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success">View Orders</a>
-                                <a href="{% url 'accounts:logout' %}" class="btn btn-danger">Logout</a>
+                        </div>
+                        <div class="profile-tools">
+                            <div class="dropdown">
+                                <button class="btn settings-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account settings">
+                                    <span class="settings-toggle-bars" aria-hidden="true">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end settings-menu">
+                                    <div class="settings-menu-title">Account</div>
+                                    <div class="settings-menu-warning">
+                                        Warning: deleting your account is permanent and cannot be undone.
+                                    </div>
+                                    <form method="post" action="{% url 'accounts:delete_account' %}" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="confirm" value="yes">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirmDeleteAccount();">Delete Account</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                </div>
 
                 <div class="card-body">
                     <div class="row gy-4">
-                        <div class="col-xl-4">
+                        <div class="col-lg-8 mx-auto">
                             <div class="card info-panel mb-4">
                                 <div class="card-body">
-                                    <div class="section-title">Profile Summary</div>
-                                    <div class="detail-row"><span class="detail-label">Username</span><span class="detail-value">{{ user.username }}</span></div>
-                                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">{{ user.email }}</span></div>
+                                    <div class="summary-top">
+                                        <div class="section-title mb-0">Account Summary</div>
+                                        <span class="summary-badge {% if profile_completion.is_complete %}complete{% else %}incomplete{% endif %}">
+                                            <i class="fas {% if profile_completion.is_complete %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+                                            {% if profile_completion.is_complete %}Complete{% else %}Needs Attention{% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="summary-progress">
+                                        <div class="summary-progress-copy">
+                                            <span><span data-summary-completed>{{ profile_completion.completed_fields }}</span> of <span data-summary-total>{{ profile_completion.total_fields }}</span> profile fields completed</span>
+                                            <strong><span data-summary-percent>{{ profile_completion.completion_percent }}</span>%</strong>
+                                        </div>
+                                        <div class="summary-progress-bar">
+                                            <div class="summary-progress-value" data-summary-progress style="width: {{ profile_completion.completion_percent }}%;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-row"><span class="detail-label">Full Name</span><span class="detail-value" data-summary-full-name>{{ user.get_full_name|default:'Not provided' }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">Username</span><span class="detail-value" data-summary-username>@{{ user.username }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value" data-summary-email>{{ user.email|default:'Email not set' }}</span></div>
                                     <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">{{ user.is_active|yesno:"Active,Inactive" }}</span></div>
-                                    <div class="detail-row"><span class="detail-label">Member Since</span><span class="detail-value">{{ user.date_joined|date:"F d, Y" }}</span></div>
-                                    <div class="detail-row"><span class="detail-label">Last Login</span><span class="detail-value">{{ user.last_login|date:"F d, Y H:i"|default:'Never' }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value" data-summary-phone>{{ profile.contact_number|default:'Not provided' }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value" data-summary-address>{{ profile.address|default:'Not provided' }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">City</span><span class="detail-value" data-summary-city>{{ profile.city|default:'-' }}</span></div>
+                                    <div class="detail-row"><span class="detail-label">Joined</span><span class="detail-value">{{ user.date_joined|date:"F d, Y" }}</span></div>
+                                    <div class="summary-missing" data-summary-missing {% if profile_completion.is_complete %}hidden{% endif %}>
+                                            <strong>Still missing</strong>
+                                            <span class="summary-missing-list" data-summary-missing-list>{{ profile_completion.missing_fields|join:", " }}</span>
+                                        </div>
                                 </div>
                             </div>
 
-                            <div class="card info-panel mb-4">
+                            <div class="card edit-panel mt-4">
                                 <div class="card-body">
-                                    <div class="section-title">Contact Information</div>
-                                    <div class="detail-row"><span class="detail-label">Phone</span><span class="detail-value">{{ profile.contact_number|default:'Not provided' }}</span></div>
-                                    <div class="detail-row"><span class="detail-label">Address</span><span class="detail-value">{{ profile.address|default:'Not provided' }}</span></div>
-                                    <div class="detail-row"><span class="detail-label">City / State</span><span class="detail-value">{{ profile.city|default:'-' }}, {{ profile.state|default:'-' }}</span></div>
+                                    <div class="section-title">Edit Profile</div>
+                                    <p class="form-card-copy">Update your account details here without affecting your order history or account metrics. Leave the password field blank if you do not want to change it.</p>
+
+                                    <form method="post" class="profile-form" enctype="multipart/form-data" novalidate>
+                                        {% csrf_token %}
+                                        {{ form.avatar_mode.as_hidden }}
+                                        {{ form.avatar_template.as_hidden }}
+
+                                        {% if form.non_field_errors %}
+                                            <div class="alert alert-danger">
+                                                {{ form.non_field_errors }}
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="avatar-editor">
+                                            <div class="avatar-preview {{ profile.avatar_template|default:'leaf' }}">
+                                                {% if profile.avatar_mode == 'upload' and profile.profile_image %}
+                                                    <img id="profileAvatarPreview" src="{{ profile.profile_image.url }}" alt="{{ user.username }} avatar preview">
+                                                {% elif profile.avatar_template == 'basket' %}
+                                                    <i class="fas fa-basket-shopping"></i>
+                                                {% elif profile.avatar_template == 'sun' %}
+                                                    <i class="fas fa-sun"></i>
+                                                {% elif profile.avatar_template == 'berry' %}
+                                                    <i class="fas fa-seedling"></i>
+                                                {% else %}
+                                                    <i class="fas fa-leaf"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="avatar-editor-copy">
+                                                <div class="avatar-editor-title">Avatar Picture</div>
+                                                <p>Upload your own profile photo. Save the form after choosing a new image.</p>
+                                                {{ form.profile_image }}
+                                                {% if form.profile_image.errors %}<div class="text-danger small mt-1">{{ form.profile_image.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="form-section-title">Personal Info</div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                                                {{ form.first_name }}
+                                                {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                                                {{ form.last_name }}
+                                                {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="{{ form.username.id_for_label }}">Username</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">@</span>
+                                                    {{ form.username }}
+                                                </div>
+                                                {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="{{ form.email.id_for_label }}">Email</label>
+                                                {{ form.email }}
+                                                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="form-section-title mt-4">Contact Details</div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="{{ form.contact_number.id_for_label }}">Phone Number</label>
+                                                {{ form.contact_number }}
+                                                {% if form.contact_number.errors %}<div class="text-danger small mt-1">{{ form.contact_number.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="{{ form.city.id_for_label }}">City</label>
+                                                {{ form.city }}
+                                                {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="{{ form.address.id_for_label }}">Address</label>
+                                                {{ form.address }}
+                                                {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors|join:", " }}</div>{% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="form-actions">
+                                            <button type="submit" class="btn btn-success">Save Profile</button>
+                                            <button type="button" class="btn btn-outline-secondary" id="resetProfileForm">Reset Changes</button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
 
-                            <div class="card stats-panel">
+                            <div class="card note-panel mt-4">
+                                <div class="card-body">
+                                    <div class="section-title">Profile Tips</div>
+                                    <div class="profile-help-list">
+                                        <div class="profile-help-item">
+                                            <strong>Keep your contact details current</strong>
+                                            This helps make checkout and order follow-up smoother.
+                                        </div>
+                                        <div class="profile-help-item">
+                                            <strong>Your account metrics stay intact</strong>
+                                            Updating your profile will not remove your order totals, member history, or account role.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card stats-panel mt-4">
                                 <div class="card-body">
                                     <div class="section-title">Account Metrics</div>
                                     <div class="stats-grid">
@@ -248,7 +795,7 @@
                                             <div class="stat-label">Orders Placed</div>
                                         </div>
                                         <div class="stat-card">
-                                            <div class="stat-number">₱{{ total_spent|floatformat:2 }}</div>
+                                            <div class="stat-number">&#8369;{{ total_spent|floatformat:2 }}</div>
                                             <div class="stat-label">Total Spent</div>
                                         </div>
                                         <div class="stat-card">
@@ -259,72 +806,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-xl-8">
-                            <div class="card edit-panel mb-4">
-                                <div class="card-body">
-                                    <div class="section-title">Edit Profile</div>
-                                    <p class="profile-subtitle">Update your account details and contact information anytime.</p>
-
-                                    <form method="post" class="profile-form">
-                                        {% csrf_token %}
-                                        <div class="row g-3 mt-2">
-                                            <div class="col-md-6">
-                                                <label for="id_username" class="form-label">Username</label>
-                                                {{ form.username }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="id_first_name" class="form-label">First Name</label>
-                                                {{ form.first_name }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="id_last_name" class="form-label">Last Name</label>
-                                                {{ form.last_name }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="id_email" class="form-label">Email</label>
-                                                {{ form.email }}
-                                            </div>
-                                                <div class="col-12">
-                                                <label for="id_address" class="form-label">Address</label>
-                                                {{ form.address }}
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="id_contact_number" class="form-label">Phone Number</label>
-                                                {{ form.contact_number }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                <label for="id_city" class="form-label">City</label>
-                                                {{ form.city }}
-                                            </div>
-                                        </div>
-
-                                        {% if form.errors %}
-                                        <div class="alert alert-danger mt-4">
-                                            Please fix the errors in the form.
-                                        </div>
-                                        {% endif %}
-
-                                        <div class="mt-4 d-flex flex-column flex-sm-row gap-3">
-                                            <button type="submit" class="btn btn-success">Save Changes</button>
-                                            <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">Back to Shop</a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <div class="card note-panel">
-                                <div class="card-body">
-                                    <div class="section-title">Profile Tips</div>
-                                    <p class="profile-subtitle">Keep your account profile up to date so your orders are delivered correctly and you receive real-time notifications.</p>
-                                    <ul style="margin: 1rem 0 0 1rem; color: #617566; line-height: 1.7;">
-                                        <li>Use a valid email address for order confirmation.</li>
-                                        <li>Provide your full address to avoid delivery delays.</li>
-                                        <li>Update your phone number so delivery staff can contact you.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -332,3 +813,149 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmLogout() {
+    return confirm('Are you sure you want to log out?');
+}
+
+function confirmDeleteAccount() {
+    if (!confirm('Warning: this account will be permanently deleted. This cannot be undone.')) {
+        return false;
+    }
+
+    return confirm('Final warning: deleting this account will remove your profile and your order history forever. Continue?');
+}
+
+(function () {
+    const form = document.querySelector('.profile-form');
+    const resetButton = document.getElementById('resetProfileForm');
+    const profileImageInput = document.getElementById('id_profile_image');
+    const profileAvatarImage = document.getElementById('profileAvatarImage');
+    const profileAvatarPreview = document.getElementById('profileAvatarPreview');
+    const avatarModeInput = document.getElementById('id_avatar_mode');
+    if (!form) {
+        return;
+    }
+
+    const refs = {
+        firstName: document.getElementById('id_first_name'),
+        lastName: document.getElementById('id_last_name'),
+        username: document.getElementById('id_username'),
+        email: document.getElementById('id_email'),
+        phone: document.getElementById('id_contact_number'),
+        address: document.getElementById('id_address'),
+        city: document.getElementById('id_city'),
+        fullName: document.querySelector('[data-summary-full-name]'),
+        usernameText: document.querySelector('[data-summary-username]'),
+        emailText: document.querySelector('[data-summary-email]'),
+        phoneText: document.querySelector('[data-summary-phone]'),
+        addressText: document.querySelector('[data-summary-address]'),
+        cityText: document.querySelector('[data-summary-city]'),
+        completed: document.querySelector('[data-summary-completed]'),
+        total: document.querySelector('[data-summary-total]'),
+        percent: document.querySelector('[data-summary-percent]'),
+        progress: document.querySelector('[data-summary-progress]'),
+        badge: document.querySelector('.summary-badge'),
+        missingBox: document.querySelector('[data-summary-missing]'),
+        missingList: document.querySelector('[data-summary-missing-list]'),
+    };
+
+    const requiredFields = [
+        { label: 'Full Name', getValue: () => `${refs.firstName?.value || ''} ${refs.lastName?.value || ''}`.trim() },
+        { label: 'Username', getValue: () => refs.username?.value || '' },
+        { label: 'Email', getValue: () => refs.email?.value || '' },
+        { label: 'Phone', getValue: () => refs.phone?.value || '' },
+        { label: 'Address', getValue: () => refs.address?.value || '' },
+        { label: 'City', getValue: () => refs.city?.value || '' },
+    ];
+
+    const textOrFallback = (value, fallback) => {
+        const clean = (value || '').trim();
+        return clean || fallback;
+    };
+
+    const render = () => {
+        const fullName = `${refs.firstName?.value || ''} ${refs.lastName?.value || ''}`.trim();
+        const username = refs.username?.value || '';
+        const email = refs.email?.value || '';
+        const phone = refs.phone?.value || '';
+        const address = refs.address?.value || '';
+        const city = refs.city?.value || '';
+
+        if (refs.fullName) refs.fullName.textContent = textOrFallback(fullName, 'Not provided');
+        if (refs.usernameText) refs.usernameText.textContent = `@${textOrFallback(username, '')}`.trim() || '@';
+        if (refs.emailText) refs.emailText.textContent = textOrFallback(email, 'Email not set');
+        if (refs.phoneText) refs.phoneText.textContent = textOrFallback(phone, 'Not provided');
+        if (refs.addressText) refs.addressText.textContent = textOrFallback(address, 'Not provided');
+        if (refs.cityText) refs.cityText.textContent = textOrFallback(city, '-');
+
+        const missing = requiredFields
+            .filter((field) => !field.getValue().trim())
+            .map((field) => field.label);
+        const total = requiredFields.length;
+        const completed = total - missing.length;
+        const percent = Math.round((completed / total) * 100);
+
+        if (refs.completed) refs.completed.textContent = completed;
+        if (refs.total) refs.total.textContent = total;
+        if (refs.percent) refs.percent.textContent = percent;
+        if (refs.progress) refs.progress.style.width = `${percent}%`;
+
+        if (refs.badge) {
+            refs.badge.classList.toggle('complete', missing.length === 0);
+            refs.badge.classList.toggle('incomplete', missing.length > 0);
+            refs.badge.innerHTML = missing.length === 0
+                ? '<i class="fas fa-circle-check"></i> Complete'
+                : '<i class="fas fa-circle-exclamation"></i> Needs Attention';
+        }
+
+        if (refs.missingBox && refs.missingList) {
+            refs.missingBox.hidden = missing.length === 0;
+            refs.missingList.textContent = missing.join(', ');
+        }
+    };
+
+    form.addEventListener('input', render);
+    form.addEventListener('change', render);
+
+    if (resetButton) {
+        resetButton.addEventListener('click', () => {
+            form.reset();
+            window.requestAnimationFrame(render);
+        });
+    }
+
+    if (profileImageInput) {
+        profileImageInput.addEventListener('change', () => {
+            const file = profileImageInput.files && profileImageInput.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (avatarModeInput) {
+                avatarModeInput.value = 'upload';
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (profileAvatarImage) {
+                    profileAvatarImage.src = event.target.result;
+                }
+                if (profileAvatarPreview) {
+                    profileAvatarPreview.src = event.target.result;
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    render();
+})();
+</script>
+{% endblock %}
+
+
+
+
