@@ -4,4 +4,6 @@ gunicorn
 whitenoise
 dj-database-url
 psycopg[binary]
+cloudinary
+django-cloudinary-storage
 # For PostgreSQL: psycopg2-binary
