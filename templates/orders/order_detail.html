@@ -6,6 +6,12 @@
 <style>
     .order-detail-page {
         padding: 3rem 0;
+        overflow-x: clip;
+        scrollbar-width: none;
+    }
+
+    .order-detail-page::-webkit-scrollbar {
+        display: none;
     }
     .order-detail-header {
         display: flex;
@@ -50,6 +56,19 @@
     @media (max-width: 767px) {
         .order-detail-page {
             padding: 2rem 0;
+        }
+        .order-detail-page.container-xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .order-detail-page .row {
+            --bs-gutter-x: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .order-detail-page .row > [class*="col-"] {
+            padding-left: 0;
+            padding-right: 0;
         }
         .order-detail-header {
             flex-direction: column;

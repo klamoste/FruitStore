@@ -6,6 +6,12 @@
 <style>
     .checkout-page {
         padding: 4rem 0;
+        overflow-x: clip;
+        scrollbar-width: none;
+    }
+
+    .checkout-page::-webkit-scrollbar {
+        display: none;
     }
     .checkout-card {
         border: none;
@@ -194,6 +200,19 @@
     @media (max-width: 767px) {
         .checkout-page {
             padding: 2rem 0;
+        }
+        .checkout-page.container-xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .checkout-page .row {
+            --bs-gutter-x: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .checkout-page .row > [class*="col-"] {
+            padding-left: 0;
+            padding-right: 0;
         }
         .checkout-card .card-header,
         .checkout-card .card-body,

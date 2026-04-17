@@ -6,6 +6,12 @@
 <style>
     .cart-page {
         padding: 3rem 0;
+        overflow-x: clip;
+        scrollbar-width: none;
+    }
+
+    .cart-page::-webkit-scrollbar {
+        display: none;
     }
 
     .cart-shell {
@@ -154,12 +160,28 @@
             position: static;
             top: auto;
         }
+
+        .cart-page .row {
+            --bs-gutter-x: 1rem;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .cart-page .row > [class*="col-"] {
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
 
     @media (max-width: 480px) {
         .cart-page h1 {
             font-size: 1.75rem;
             margin-bottom: 1.5rem !important;
+        }
+
+        .cart-page .container-xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
 
         .cart-item {
