@@ -203,6 +203,8 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'products:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
