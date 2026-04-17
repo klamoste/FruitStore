@@ -417,16 +417,6 @@
         </div>
     </nav>
 
-    {% if messages %}
-    <div class="container-xl" style="padding-top: 1.25rem;">
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }}" role="alert">
-            {{ message }}
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    
     <!-- ===== CONTENT ===== -->
     {% block content %}{% endblock %}
     
