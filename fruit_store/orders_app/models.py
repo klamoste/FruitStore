@@ -50,6 +50,9 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    selected_size = models.CharField(max_length=10, blank=True, default='')
+    selected_unit_label = models.CharField(max_length=40, blank=True, default='')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

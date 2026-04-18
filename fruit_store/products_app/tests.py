@@ -21,6 +21,18 @@ class ProductViewsTests(TestCase):
             unit='kg',
             is_available=True,
         )
+        Product.objects.create(
+            name='Fresh Orange Juice',
+            description='Freshly squeezed orange juice.',
+            category=category,
+            price='100.00',
+            stock_quantity=8,
+            unit='cup',
+            small_price='80.00',
+            medium_price='100.00',
+            large_price='120.00',
+            is_available=True,
+        )
         cls.user = User.objects.create_user(username='buyer', password='secret123')
 
     def test_product_list_renders_products(self):
@@ -65,3 +77,16 @@ class ProductViewsTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+
+    def test_product_detail_shows_cup_size_picker(self):
+        product = Product.objects.get(name='Fresh Orange Juice')
+
+        response = self.client.get(
+            reverse('products:product_detail', args=[product.id]),
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Choose Cup Size')
+        self.assertContains(response, 'Small')
+        self.assertContains(response, 'Large')

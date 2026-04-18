@@ -10,9 +10,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'price', 'stock_quantity', 'unit', 'is_available']
+    list_display = ['name', 'category', 'price', 'stock_quantity', 'display_unit', 'is_available']
     list_filter = ['category', 'is_available']
     search_fields = ['name', 'description']
+    exclude = ['size']
+
+    @admin.display(description='Unit')
+    def display_unit(self, obj):
+        return obj.unit_label
 
 
 @admin.register(InventoryLog)

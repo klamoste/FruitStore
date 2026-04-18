@@ -1,6 +1,5 @@
 import re
-
-import re
+from decimal import Decimal
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -96,10 +95,14 @@ def product_detail(request, pk):
         return redirect('products:product_list')
 
     form = AddToCartForm()
+    cup_size_options = product.available_cup_sizes
+    default_cup_option = cup_size_options[0] if cup_size_options else None
     
     context = {
         'product': product,
         'form': form,
+        'cup_size_options': cup_size_options,
+        'default_cup_option': default_cup_option,
     }
     return render(request, 'products/product_detail.html', context)
 
@@ -120,6 +123,21 @@ def add_to_cart(request, pk):
         form = AddToCartForm(request.POST)
         if form.is_valid():
             quantity = form.cleaned_data['quantity']
+            selected_size = ''
+            unit_price = Decimal(product.price)
+            unit_label = product.unit_label
+
+            if product.available_cup_sizes:
+                selected_size = request.POST.get('selected_size', '')
+                selected_option = next(
+                    (option for option in product.available_cup_sizes if option['value'] == selected_size),
+                    None,
+                )
+                if not selected_option:
+                    selected_option = product.available_cup_sizes[0]
+                    selected_size = selected_option['value']
+                unit_price = Decimal(selected_option['price'])
+                unit_label = selected_option['unit_label']
             
             if quantity > product.stock_quantity:
                 messages.error(request, f'Only {product.stock_quantity} items available in stock.')
@@ -127,13 +145,17 @@ def add_to_cart(request, pk):
             
             cart = request.session.get('cart', {})
             product_id = str(pk)
+            cart_key = f'{product_id}:{selected_size or "default"}'
             
-            if product_id in cart:
-                cart[product_id]['quantity'] += quantity
+            if cart_key in cart:
+                cart[cart_key]['quantity'] += quantity
             else:
-                cart[product_id] = {
+                cart[cart_key] = {
+                    'product_id': product_id,
                     'quantity': quantity,
-                    'price': str(product.price)
+                    'price': str(unit_price),
+                    'selected_size': selected_size,
+                    'unit_label': unit_label,
                 }
             
             request.session['cart'] = cart

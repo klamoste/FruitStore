@@ -12,6 +12,14 @@ from decimal import Decimal
 SHIPPING_FEE = Decimal('50.00')
 
 
+def get_cart_labels(product, item):
+    selected_size = item.get('selected_size', '')
+    if selected_size and product.unit == 'cup':
+        selected_label = f'{selected_size.title()} Cup'
+        return selected_size, selected_label, 'Cup'
+    return selected_size, '', item.get('unit_label') or product.unit_label
+
+
 def get_missing_profile_fields(user):
     try:
         profile, _ = Profile.objects.get_or_create(user=user, defaults={'role': 'customer'})
@@ -41,11 +49,13 @@ def view_cart(request):
     total_price = Decimal('0.00')
     
     try:
-        for product_id, item in cart.items():
+        for cart_key, item in cart.items():
             try:
+                product_id = item.get('product_id') or cart_key.split(':', 1)[0]
                 product = Product.objects.get(id=product_id)
                 quantity = item['quantity']
                 subtotal = Decimal(item['price']) * quantity
+                selected_size, selected_label, unit_label = get_cart_labels(product, item)
                 total_price += subtotal
                 cart_items.append({
                     'product': product,
@@ -53,6 +63,11 @@ def view_cart(request):
                     'price': Decimal(item['price']),
                     'subtotal': subtotal,
                     'product_id': product_id,
+                    'cart_key': cart_key,
+                    'selected_size': selected_size,
+                    'selected_label': selected_label,
+                    'unit_label': unit_label,
+                    'cup_size_options': product.available_cup_sizes,
                 })
             except Product.DoesNotExist:
                 continue
@@ -84,17 +99,60 @@ def update_cart(request, product_id):
     if request.method == 'POST':
         quantity = request.POST.get('quantity')
         action = request.POST.get('action')
+        cart_key = request.POST.get('cart_key') or product_id_str
         
         if action == 'remove':
-            if product_id_str in cart:
-                del cart[product_id_str]
+            if cart_key in cart:
+                del cart[cart_key]
                 messages.success(request, 'Item removed from cart.')
+        elif action == 'change_size':
+            selected_size = request.POST.get('selected_size', '')
+            quantity = request.POST.get('quantity')
+            if cart_key in cart:
+                try:
+                    product = get_object_or_404(Product, id=product_id)
+                    selected_option = next(
+                        (option for option in product.available_cup_sizes if option['value'] == selected_size),
+                        None,
+                    )
+                    if not selected_option:
+                        messages.error(request, 'Please choose a valid cup size.')
+                    else:
+                        current_item = cart[cart_key]
+                        new_quantity = current_item['quantity']
+                        if quantity:
+                            new_quantity = max(1, int(quantity))
+                        if new_quantity > product.stock_quantity:
+                            messages.error(request, f'Only {product.stock_quantity} items available.')
+                            request.session['cart'] = cart
+                            return redirect('orders:cart')
+                        new_cart_key = f'{product_id_str}:{selected_size}'
+                        if new_cart_key != cart_key and new_cart_key in cart:
+                            cart[new_cart_key]['quantity'] += new_quantity
+                            del cart[cart_key]
+                        else:
+                            cart[new_cart_key] = {
+                                **current_item,
+                                'product_id': product_id_str,
+                                'selected_size': selected_size,
+                                'quantity': new_quantity,
+                                'price': str(selected_option['price']),
+                                'unit_label': selected_option['unit_label'],
+                            }
+                            if new_cart_key != cart_key:
+                                del cart[cart_key]
+                        messages.success(request, 'Cup size updated.')
+                except DatabaseError:
+                    messages.error(
+                        request,
+                        'Cart updates are temporarily unavailable while the database is being configured.'
+                    )
         elif action == 'update':
             if quantity:
                 quantity = int(quantity)
                 if quantity <= 0:
-                    if product_id_str in cart:
-                        del cart[product_id_str]
+                    if cart_key in cart:
+                        del cart[cart_key]
                         messages.success(request, 'Item removed from cart.')
                 else:
                     try:
@@ -102,7 +160,7 @@ def update_cart(request, product_id):
                         if quantity > product.stock_quantity:
                             messages.error(request, f'Only {product.stock_quantity} items available.')
                         else:
-                            cart[product_id_str]['quantity'] = quantity
+                            cart[cart_key]['quantity'] = quantity
                             messages.success(request, 'Cart updated.')
                     except DatabaseError:
                         messages.error(
@@ -136,14 +194,20 @@ def checkout(request):
     total_price = Decimal('0.00')
     cart_items = []
     try:
-        for product_id, item in cart.items():
+        for cart_key, item in cart.items():
+            product_id = item.get('product_id') or cart_key.split(':', 1)[0]
             product = Product.objects.get(id=product_id)
             quantity = item['quantity']
             subtotal = Decimal(item['price']) * quantity
+            selected_size, selected_label, unit_label = get_cart_labels(product, item)
             total_price += subtotal
             cart_items.append({
                 'product': product,
                 'quantity': quantity,
+                'unit_price': Decimal(item['price']),
+                'selected_size': selected_size,
+                'selected_label': selected_label,
+                'unit_label': unit_label,
                 'subtotal': subtotal,
             })
     except (DatabaseError, Product.DoesNotExist):
@@ -179,6 +243,9 @@ def checkout(request):
                         order=order,
                         product=product,
                         quantity=quantity,
+                        unit_price=item['unit_price'],
+                        selected_size=item['selected_size'],
+                        selected_unit_label=item['selected_label'],
                         subtotal=subtotal
                     )
                     
@@ -240,6 +307,13 @@ def order_detail(request, order_id):
     try:
         order = get_object_or_404(Order, id=order_id, user=request.user)
         items = OrderItem.objects.filter(order=order)
+        for item in items:
+            if item.selected_size and item.product.unit == 'cup':
+                item.display_unit_label = 'Cup'
+                item.display_selected_label = item.selected_unit_label or f'{item.selected_size.title()} Cup'
+            else:
+                item.display_unit_label = item.selected_unit_label or item.product.unit_label
+                item.display_selected_label = item.selected_unit_label
         subtotal_price = sum((item.subtotal for item in items), Decimal('0.00'))
     except DatabaseError:
         messages.error(
