@@ -37,6 +37,41 @@
         box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
     }
 
+    .category-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .category-filter-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(45, 122, 90, 0.18);
+        background: #fff;
+        color: var(--primary-green);
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .category-filter-pill:hover {
+        background: #eff8f1;
+        color: var(--primary-green);
+        transform: translateY(-1px);
+    }
+
+    .category-filter-pill.active {
+        background: var(--primary-green);
+        color: #fff;
+        border-color: var(--primary-green);
+        box-shadow: 0 12px 26px rgba(45, 122, 90, 0.18);
+    }
+
     .product-card {
         border: none;
         border-radius: 1.5rem;
@@ -135,6 +170,11 @@
             max-width: none;
         }
 
+        .category-filter-bar {
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
         .products-search form,
         .products-search {
             width: 100%;
@@ -172,6 +212,21 @@
         .products-search {
             flex-direction: column;
             align-items: stretch !important;
+        }
+
+        .category-filter-bar {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 0.35rem;
+            scrollbar-width: none;
+        }
+
+        .category-filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-filter-pill {
+            flex: 0 0 auto;
         }
 
         .products-search-input,
@@ -214,8 +269,22 @@
         </div>
         <form method="get" class="d-flex align-items-center gap-2 products-search">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..." class="products-search-input">
+            {% if category_id %}<input type="hidden" name="category" value="{{ category_id }}">{% endif %}
             <button type="submit" class="btn-primary-custom" style="padding: 0.85rem 1.5rem; border-radius: 999px;">Search</button>
         </form>
+    </div>
+
+    <div class="category-filter-bar">
+        <a href="{% url 'products:product_list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
+           class="category-filter-pill {% if not category_id %}active{% endif %}">
+            All
+        </a>
+        {% for category in categories %}
+        <a href="{% url 'products:product_list' %}?category={{ category.id }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+           class="category-filter-pill {% if category_id == category.id|stringformat:'s' %}active{% endif %}">
+            {{ category.name }}
+        </a>
+        {% endfor %}
     </div>
 
     <div class="row gx-4 gy-4 products-grid">
