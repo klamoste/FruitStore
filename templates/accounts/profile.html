@@ -77,11 +77,17 @@
     .profile-copy {
         min-width: 0;
     }
-    .profile-tools {
-        margin-left: auto;
+    .profile-header-controls {
         display: flex;
-        align-items: flex-start;
-        justify-content: flex-end;
+        align-items: center;
+        gap: 0.9rem;
+        flex-wrap: wrap;
+        margin-top: 0.85rem;
+    }
+    .profile-tools {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
         flex-shrink: 0;
     }
     .settings-toggle {
@@ -511,10 +517,6 @@
         .profile-identity {
             align-items: flex-start;
         }
-        .profile-tools {
-            margin-left: 0;
-            justify-content: flex-start;
-        }
         .stats-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -540,6 +542,12 @@
         .profile-copy {
             width: 100%;
         }
+        .profile-header-controls {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
         .profile-meta-list {
             align-items: center;
         }
@@ -548,8 +556,7 @@
         }
         .profile-actions {
             width: 100%;
-            flex-direction: column;
-            gap: 0.75rem;
+            justify-content: center;
         }
         .avatar-editor {
             flex-direction: column;
@@ -559,9 +566,12 @@
             width: 100%;
             min-width: unset;
         }
-        .profile-actions form,
-        .profile-actions button {
+        .profile-tools .dropdown,
+        .profile-tools .settings-toggle {
             width: 100%;
+        }
+        .profile-tools .settings-toggle {
+            min-height: 46px;
         }
         .stats-grid {
             grid-template-columns: 1fr;
@@ -606,40 +616,20 @@
                             </div>
                             <div class="profile-copy">
                                 <h2 class="profile-title">{{ user.username }}</h2>
-                                <div class="d-flex flex-wrap align-items-center gap-3">
+                                <div class="profile-header-controls">
                                     <span class="profile-badge">
                                         <i class="fas fa-user-tag"></i>
                                         {{ profile.get_role_display }}
-                                        </span>
-                                        <div class="profile-actions">
-                                            <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success">View Orders</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="profile-tools">
-                            <div class="dropdown">
-                                <button class="btn settings-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account settings">
-                                    <span class="settings-toggle-bars" aria-hidden="true">
-                                        <span></span>
-                                        <span></span>
-                                        <span></span>
                                     </span>
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end settings-menu">
-                                    <div class="settings-menu-title">Account</div>
-                                    <div class="settings-menu-warning">
-                                        Warning: deleting your account is permanent and cannot be undone.
+                                    <div class="profile-actions">
+                                        <a href="{% url 'orders:cart' %}" class="btn btn-outline-success">Cart</a>
                                     </div>
-                                    <form method="post" action="{% url 'accounts:delete_account' %}" style="margin: 0;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="confirm" value="yes">
-                                        <button type="submit" class="btn btn-danger" onclick="return confirmDeleteAccount();">Delete Account</button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 </div>
 
                 <div class="card-body">

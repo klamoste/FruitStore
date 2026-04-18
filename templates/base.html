@@ -86,22 +86,21 @@
         }
         
         .nav-link {
-            color: #666 !important;
-            font-weight: 500;
+            color: #fff !important;
+            font-weight: 600;
             margin: 0 0.5rem;
-            transition: color 0.3s;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+            background-color: var(--light-green);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.35rem !important;
+            box-shadow: 0 10px 24px rgba(45, 122, 90, 0.14);
         }
         
         .nav-link:hover,
         .nav-link.active {
-            color: var(--primary-green) !important;
-        }
-        
-        .nav-link.active {
-            background-color: var(--light-green);
-            color: white !important;
-            border-radius: 0.5rem;
-            padding: 0.5rem 1rem !important;
+            color: #fff !important;
+            background-color: var(--primary-green);
+            transform: translateY(-1px);
         }
         
         .navbar-nav {
@@ -152,6 +151,12 @@
         }
         .logout-link:hover {
             color: var(--primary-green) !important;
+        }
+        .delete-account-link {
+            color: #dc2626 !important;
+        }
+        .delete-account-link:hover {
+            color: #b91c1c !important;
         }
         footer .logout-link {
             color: #999 !important;
@@ -478,6 +483,13 @@
                             <button type="submit" class="nav-link logout-link" onclick="return confirmLogout();">Logout</button>
                         </form>
                     </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'accounts:delete_account' %}" class="logout-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="confirm" value="yes">
+                            <button type="submit" class="nav-link logout-link delete-account-link" onclick="return confirmDeleteAccount();">Delete Account</button>
+                        </form>
+                    </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
@@ -544,6 +556,14 @@
     <script>
         function confirmLogout() {
             return confirm('Are you sure you want to log out?');
+        }
+
+        function confirmDeleteAccount() {
+            if (!confirm('Warning: this account will be permanently deleted. This cannot be undone.')) {
+                return false;
+            }
+
+            return confirm('Final warning: deleting this account will remove your profile and your order history forever. Continue?');
         }
     </script>
     {% block extra_js %}{% endblock %}
