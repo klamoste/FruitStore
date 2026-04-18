@@ -29,6 +29,25 @@ class ProductViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Apple')
 
+    def test_product_list_only_matches_full_words_in_description(self):
+        response = self.client.get(
+            reverse('products:product_list'),
+            {'q': 'swe'},
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Apple')
+
+        response = self.client.get(
+            reverse('products:product_list'),
+            {'q': 'App'},
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Apple')
+
     def test_product_list_handles_database_error(self):
         with patch('products_app.views.Product.objects.filter', side_effect=DatabaseError('boom')):
             response = self.client.get(reverse('products:product_list'), follow=True)

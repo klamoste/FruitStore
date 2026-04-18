@@ -1,3 +1,7 @@
+import re
+
+import re
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -37,9 +41,10 @@ def product_list(request):
         categories = Category.objects.all().order_by('name')
         
         if query:
+            description_word_match = rf'(^|\W){re.escape(query)}(\W|$)'
             products = products.filter(
                 Q(name__icontains=query) |
-                Q(description__icontains=query)
+                Q(description__iregex=description_word_match)
             )
         
         if category_id:
