@@ -20,7 +20,24 @@ def env_flag(name, default=False):
     value = os.environ.get(name)
     if value is None:
         return default
-    return value.strip().lower() in {'1', 'true', 'yes', 'on'}
+    normalized = value.strip().lower()
+    if normalized in {'1', 'true', 'yes', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'no', 'off'}:
+        return False
+    return default
+
+
+def get_database_url():
+    value = os.environ.get('DATABASE_URL', '').strip()
+    if not value:
+        return ''
+
+    lowered = value.lower()
+    if any(token in lowered for token in ('@host:', '/dbname', '/database')):
+        return ''
+
+    return value
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -114,7 +131,8 @@ DATABASES = {
     }
 }
 
-database_url = os.environ.get('DATABASE_URL')
+database_url = get_database_url()
+DATABASE_URL_CONFIGURED = bool(database_url)
 if database_url:
     DATABASES['default'] = dj_database_url.parse(
         database_url,

@@ -8,8 +8,12 @@ https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
 """
 
 import os
+from pathlib import Path
 
 from django.core.asgi import get_asgi_application
+from env_loader import load_env_file
+
+load_env_file(Path(__file__).resolve().parent.parent)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
