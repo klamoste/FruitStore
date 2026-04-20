@@ -91,7 +91,8 @@ class ProductViewsTests(TestCase):
             response = self.client.get(reverse('products:product_list'), follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'temporarily unavailable')
+        self.assertContains(response, 'Product catalog unavailable')
+        self.assertContains(response, 'database finishes connecting')
 
     def test_add_to_cart_requires_login(self):
         product = Product.objects.get(name='Apple')

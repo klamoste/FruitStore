@@ -42,6 +42,7 @@ def product_list(request):
     """Display all products with search and filter functionality."""
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
+    catalog_unavailable = False
 
     try:
         ensure_sample_catalog()
@@ -80,16 +81,14 @@ def product_list(request):
     except DatabaseError:
         products = []
         categories = []
-        messages.error(
-            request,
-            'The product catalog is temporarily unavailable. Please try again after the database is configured.'
-        )
+        catalog_unavailable = True
     
     context = {
         'products': products,
         'categories': categories,
         'query': query,
         'category_id': category_id,
+        'catalog_unavailable': catalog_unavailable,
     }
     return render(request, 'products/product_list.html', context)
 
