@@ -1,6 +1,7 @@
 import re
 from decimal import Decimal
 
+from django.core.management import call_command
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -13,9 +14,16 @@ from .forms import ProductSearchForm, AddToCartForm
 from orders_app.models import Order, OrderItem
 
 
+def ensure_sample_catalog():
+    """Seed demo data when the deployed catalog is empty."""
+    if not Product.objects.exists():
+        call_command('create_sample_data', verbosity=0)
+
+
 def home(request):
     """Display home page with hero section and featured products."""
     try:
+        ensure_sample_catalog()
         featured_products = Product.objects.filter(is_available=True).order_by('-created_at')[:8]
     except DatabaseError:
         featured_products = []
@@ -36,6 +44,7 @@ def product_list(request):
     category_id = request.GET.get('category', '')
 
     try:
+        ensure_sample_catalog()
         products = Product.objects.filter(is_available=True).order_by('name')
         categories = list(Category.objects.order_by('name'))
         category_names = [category.name for category in categories]

@@ -39,6 +39,16 @@ class ProductViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Apple')
 
+    def test_product_list_seeds_sample_data_when_catalog_is_empty(self):
+        Product.objects.all().delete()
+        Category.objects.all().delete()
+
+        response = self.client.get(reverse('products:product_list'), secure=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertGreater(Product.objects.count(), 0)
+        self.assertContains(response, 'Orange Juice')
+
     def test_product_list_shows_all_categories(self):
         Category.objects.create(name='Seasonal Fruits', description='Fresh this season')
 
