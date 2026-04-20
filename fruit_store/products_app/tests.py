@@ -132,3 +132,14 @@ class ProductViewsTests(TestCase):
         self.assertNotIn('small_price', form.fields)
         self.assertNotIn('medium_price', form.fields)
         self.assertNotIn('large_price', form.fields)
+
+    def test_product_admin_handles_database_error_without_500(self):
+        admin_user = User.objects.create_superuser('admin2', 'admin2@example.com', 'secret123')
+        self.client.force_login(admin_user)
+
+        with patch('django.contrib.admin.options.ModelAdmin.changelist_view', side_effect=DatabaseError('boom')):
+            response = self.client.get(reverse('admin:products_app_product_changelist'))
+
+        self.assertEqual(response.status_code, 503)
+        self.assertContains(response, 'Database unavailable', status_code=503)
+        self.assertContains(response, 'writable production database', status_code=503)
