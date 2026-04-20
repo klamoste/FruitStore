@@ -12,13 +12,6 @@ from .models import Product, Category, InventoryLog
 from .forms import ProductSearchForm, AddToCartForm
 from orders_app.models import Order, OrderItem
 
-HIDDEN_CATEGORY_NAMES = [
-    'Beverages',
-    'Cut Fruits',
-    'Imported Fruits',
-    'Seasonal Fruits',
-]
-
 
 def home(request):
     """Display home page with hero section and featured products."""
@@ -44,7 +37,15 @@ def product_list(request):
 
     try:
         products = Product.objects.filter(is_available=True).order_by('name')
-        categories = Category.objects.exclude(name__in=HIDDEN_CATEGORY_NAMES).order_by('name')
+        categories = list(Category.objects.order_by('name'))
+        category_names = [category.name for category in categories]
+        if 'Beverages' in category_names and 'Fresh Fruits' in category_names:
+            beverages_index = category_names.index('Beverages')
+            fresh_fruits_index = category_names.index('Fresh Fruits')
+            categories[beverages_index], categories[fresh_fruits_index] = (
+                categories[fresh_fruits_index],
+                categories[beverages_index],
+            )
         
         if query:
             description_word_match = rf'(^|\W){re.escape(query)}(\W|$)'

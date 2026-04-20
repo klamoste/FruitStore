@@ -50,9 +50,6 @@ class ProductForm(forms.ModelForm):
             'price',
             'stock_quantity',
             'unit',
-            'small_price',
-            'medium_price',
-            'large_price',
             'image',
             'is_available',
         )
@@ -63,9 +60,6 @@ class ProductForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'stock_quantity': forms.NumberInput(attrs={'class': 'form-control'}),
             'unit': forms.Select(attrs={'class': 'form-select'}),
-            'small_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'medium_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'large_price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
             'is_available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

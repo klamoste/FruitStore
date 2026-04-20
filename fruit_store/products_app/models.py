@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -50,14 +49,9 @@ class Product(models.Model):
 
     def clean(self):
         self.size = ''
-        if self.unit != 'cup':
-            self.small_price = None
-            self.medium_price = None
-            self.large_price = None
-        if self.unit == 'cup' and not self.available_cup_sizes:
-            raise ValidationError(
-                'Add at least one customer-selectable cup price for cup-based products.'
-            )
+        self.small_price = None
+        self.medium_price = None
+        self.large_price = None
 
     @property
     def unit_label(self):
@@ -67,19 +61,7 @@ class Product(models.Model):
 
     @property
     def available_cup_sizes(self):
-        if self.unit != 'cup':
-            return []
-        options = []
-        for value, label in self.CUP_SIZE_CHOICES:
-            price = getattr(self, f'{value}_price')
-            if price is not None:
-                options.append({
-                    'value': value,
-                    'label': label,
-                    'price': price,
-                    'unit_label': 'Cup',
-                })
-        return options
+        return []
 
     def __str__(self):
         return self.name

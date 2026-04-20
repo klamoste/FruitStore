@@ -5,6 +5,7 @@ from django.db import DatabaseError
 from django.test import TestCase
 from django.urls import reverse
 
+from .forms import ProductForm
 from .models import Category, Product
 
 
@@ -28,9 +29,6 @@ class ProductViewsTests(TestCase):
             price='100.00',
             stock_quantity=8,
             unit='cup',
-            small_price='80.00',
-            medium_price='100.00',
-            large_price='120.00',
             is_available=True,
         )
         cls.user = User.objects.create_user(username='buyer', password='secret123')
@@ -40,6 +38,24 @@ class ProductViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Apple')
+
+    def test_product_list_shows_all_categories(self):
+        Category.objects.create(name='Seasonal Fruits', description='Fresh this season')
+
+        response = self.client.get(reverse('products:product_list'), secure=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Seasonal Fruits')
+
+    def test_product_list_swaps_beverages_and_fresh_fruits_positions(self):
+        Category.objects.create(name='Beverages', description='Fresh drinks')
+        Category.objects.create(name='Cut Fruits', description='Ready to eat')
+
+        response = self.client.get(reverse('products:product_list'), secure=True)
+
+        self.assertEqual(response.status_code, 200)
+        category_names = [category.name for category in response.context['categories']]
+        self.assertLess(category_names.index('Fresh Fruits'), category_names.index('Beverages'))
 
     def test_product_list_only_matches_full_words_in_description(self):
         response = self.client.get(
@@ -78,7 +94,7 @@ class ProductViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    def test_product_detail_shows_cup_size_picker(self):
+    def test_product_detail_uses_single_price_for_cup_products(self):
         product = Product.objects.get(name='Fresh Orange Juice')
 
         response = self.client.get(
@@ -87,6 +103,13 @@ class ProductViewsTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Choose Cup Size')
-        self.assertContains(response, 'Small')
-        self.assertContains(response, 'Large')
+        self.assertNotContains(response, 'Choose Cup Size')
+        self.assertContains(response, 'per cup')
+
+    def test_product_form_uses_single_price_field_for_cup_products(self):
+        form = ProductForm()
+
+        self.assertIn('price', form.fields)
+        self.assertNotIn('small_price', form.fields)
+        self.assertNotIn('medium_price', form.fields)
+        self.assertNotIn('large_price', form.fields)
