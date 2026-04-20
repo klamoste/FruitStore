@@ -2,7 +2,7 @@
 REM Quick Start Script for Fruit Store on Windows
 
 set "SCRIPT_DIR=%~dp0"
-set "PROJECT_DIR=%SCRIPT_DIR%fruit_store"
+set "PROJECT_DIR=%SCRIPT_DIR%"
 
 echo Fruit Store - Quick Start Setup
 echo ====================================
@@ -11,7 +11,7 @@ echo.
 cd /d "%PROJECT_DIR%"
 
 echo Step 1: Installing dependencies...
-pip install -r "%SCRIPT_DIR%requirements.txt" > nul 2>&1
+pip install -r "%PROJECT_DIR%\requirements.txt" > nul 2>&1
 echo Dependencies installed
 echo.
 

@@ -77,6 +77,84 @@
     .cart-price-text {
         text-align: right;
     }
+    .cart-size-box {
+        min-width: 260px;
+        margin-left: auto;
+    }
+    .cart-size-title {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6f7d73;
+        margin-bottom: 0.7rem;
+    }
+    .cart-size-options {
+        display: grid;
+        gap: 0.55rem;
+    }
+    .cart-size-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .cart-size-pill {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1 1 auto;
+        padding: 0.75rem 0.9rem;
+        border-radius: 0.9rem;
+        border: 1px solid #dfe9e1;
+        background: #fff;
+        color: #294235;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .cart-size-pill:hover {
+        background: #f7fbf8;
+        border-color: #b9d7c3;
+    }
+    .cart-size-pill.active {
+        background: #eff8f1;
+        border-color: #6abb72;
+        transform: translateY(-1px);
+    }
+    .cart-size-name {
+        font-weight: 700;
+    }
+    .cart-size-price {
+        color: var(--primary-green);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+    .cart-size-quantity {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+    .cart-size-quantity button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #444;
+        border-radius: 0.45rem;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    .cart-size-quantity input[name="quantity"] {
+        width: 64px;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 0.45rem;
+        text-align: center;
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
 
     .cart-summary-card {
         border: none;
@@ -121,7 +199,18 @@
             flex-direction: column;
             align-items: stretch;
         }
-
+        .cart-size-box {
+            min-width: 0;
+            margin-left: 0;
+            width: 100%;
+        }
+        .cart-size-form {
+            flex-wrap: wrap;
+        }
+        .cart-size-quantity {
+            width: 100%;
+            justify-content: flex-end;
+        }
         .cart-quantity-row {
             flex-wrap: wrap;
             gap: 0.6rem;
@@ -225,13 +314,45 @@
                         <div class="cart-item-body">
                             <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.product.name }}</h5>
                             <p style="color: #999; margin-bottom: 1rem;">{{ item.product.category.name }}</p>
+                            {% if item.selected_size %}
+                            <p style="color: var(--primary-green); margin: -0.5rem 0 1rem; font-weight: 700;">Selected: {{ item.selected_label }}</p>
+                            {% endif %}
                             
                             <div class="cart-item-meta">
+                                {% if item.cup_size_options %}
+                                <div class="cart-size-box">
+                                    <span class="cart-size-title">Choose Cup Size</span>
+                                    <div class="cart-size-options">
+                                        {% for option in item.cup_size_options %}
+                                        <form method="post" action="{% url 'orders:update_cart' item.product.id %}" class="cart-size-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="change_size">
+                                            <input type="hidden" name="cart_key" value="{{ item.cart_key }}">
+                                            <input type="hidden" name="selected_size" value="{{ option.value }}">
+                                            <button type="submit"
+                                                    class="cart-size-pill {% if option.value == item.selected_size %}active{% endif %}"
+                                                    style="border: none;"
+                                                    title="Choose {{ option.label }}">
+                                                <span class="cart-size-name">{{ option.label }}</span>
+                                                <span class="cart-size-price">&#8369;{{ option.price }}</span>
+                                            </button>
+                                            <div class="cart-size-quantity">
+                                                <button type="button" onclick="const q=this.nextElementSibling; if(q && parseInt(q.value) > 1){ q.value = parseInt(q.value) - 1; this.form.submit(); }">-</button>
+                                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" onchange="this.form.submit()">
+                                                <button type="button" onclick="const q=this.previousElementSibling; q.value = parseInt(q.value) + 1; this.form.submit();">+</button>
+                                            </div>
+                                        </form>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if not item.cup_size_options %}
                                 <div class="cart-quantity-row">
                                     <span style="color: #666;">Quantity:</span>
                                     <form method="post" action="{% url 'orders:update_cart' item.product.id %}" class="cart-quantity-form">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="update">
+                                        <input type="hidden" name="cart_key" value="{{ item.cart_key }}">
                                         <button type="button" onclick="const q=this.nextElementSibling; if(q && parseInt(q.value) > 1){ q.value = parseInt(q.value) - 1; this.form.submit(); }" style="width: 36px; height: 36px; border: 1px solid #ddd; background: #fff; color: #444; border-radius: 0.35rem; cursor: pointer; font-size: 1rem;">
                                             -
                                         </button>
@@ -242,14 +363,16 @@
                                         </button>
                                     </form>
                                 </div>
+                                {% endif %}
                                 <div class="cart-price-row">
                                     <div class="cart-price-text">
                                         <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-green);">&#8369;{{ item.subtotal }}</div>
-                                        <div style="color: #999; font-size: 0.85rem;">&#8369;{{ item.product.price }} / kg</div>
+                                        <div style="color: #999; font-size: 0.85rem;">&#8369;{{ item.price }} / {{ item.unit_label }}</div>
                                     </div>
                                     <form method="post" action="{% url 'orders:update_cart' item.product.id %}" style="margin: 0;">
                                         {% csrf_token %}
                                         <input type="hidden" name="action" value="remove">
+                                        <input type="hidden" name="cart_key" value="{{ item.cart_key }}">
                                         <button type="submit" style="background: none; border: none; color: #e74c3c; text-decoration: none; font-weight: 600; cursor: pointer; font-size: 1.2rem; padding: 0;">
                                             <i class="fas fa-trash"></i>
                                         </button>

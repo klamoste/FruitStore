@@ -317,6 +317,9 @@
                         <div class="summary-item-copy">
                             <div class="summary-item-title">{{ item.product.name }}</div>
                             <div class="summary-item-meta">Qty: {{ item.quantity }}</div>
+                            {% if item.selected_size %}
+                            <div class="summary-item-meta">{{ item.unit_label }} at ₱{{ item.unit_price }} each</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="fw-bold text-success">₱{{ item.subtotal }}</div>

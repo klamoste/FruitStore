@@ -25,5 +25,6 @@ Open `http://127.0.0.1:8000/`.
 
 - Set `SECRET_KEY` in production.
 - Set `DEBUG=False` in production.
+- On Render, run `python manage.py create_sample_data` after `migrate` so a fresh deploy has catalog data immediately.
 - For Vercel or any real deployment, prefer a hosted PostgreSQL database via `DATABASE_URL`.
-- SQLite can work for local development and demo data, but it is not a good long-term production database for this app.
+- SQLite can work for local development and demo data, but it is not a good long-term production database for this app and is not suitable for Vercel's serverless filesystem.

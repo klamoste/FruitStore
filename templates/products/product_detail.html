@@ -76,6 +76,55 @@
         font-weight: 800;
         color: var(--primary-green);
     }
+    .product-size-box {
+        margin-bottom: 1.5rem;
+    }
+    .product-size-title {
+        display: block;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.7rem;
+    }
+    .product-size-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .product-size-option input {
+        display: none;
+    }
+    .product-size-pill {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+        padding: 0.9rem 1rem;
+        border-radius: 1rem;
+        border: 1px solid #d9e3d8;
+        background: #fff;
+        color: #234131;
+        cursor: pointer;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        transition: background-color 0.25s, color 0.25s, border-color 0.25s, transform 0.25s;
+    }
+    .product-size-pill strong {
+        font-size: 1rem;
+    }
+    .product-size-pill span {
+        font-size: 0.88rem;
+        margin-top: 0.2rem;
+        color: #65806c;
+    }
+    .product-size-option input:checked + .product-size-pill {
+        background: var(--primary-green);
+        color: #fff;
+        border-color: var(--primary-green);
+        transform: translateY(-1px);
+    }
+    .product-size-option input:checked + .product-size-pill span {
+        color: rgba(255,255,255,0.88);
+    }
 
     .product-detail-actions {
         display: flex;
@@ -244,16 +293,37 @@
                     <div class="product-detail-stats">
                         <div class="product-detail-stat">
                             <div style="font-size: 0.95rem; color: #777; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem;">Price</div>
-                            <div class="product-detail-price">&#8369;{{ product.price }}</div>
-                            <div style="color: #999; margin-top: 0.5rem; font-size: 0.95rem;">per kilo - min 1 kg</div>
+                            <div class="product-detail-price" id="productPriceValue">&#8369;{% if default_cup_option %}{{ default_cup_option.price }}{% else %}{{ product.price }}{% endif %}</div>
+                            <div style="color: #999; margin-top: 0.5rem; font-size: 0.95rem;" id="productPriceUnit">per {% if default_cup_option %}{{ default_cup_option.unit_label|lower }}{% else %}{{ product.unit_label|lower }}{% endif %} - min 1</div>
                         </div>
                     </div>
 
                     <form method="post" action="{% url 'products:add_to_cart' product.id %}">
                         {% csrf_token %}
+                        {% if cup_size_options %}
+                        <div class="product-size-box">
+                            <label class="product-size-title">Choose Cup Size</label>
+                            <div class="product-size-options">
+                                {% for option in cup_size_options %}
+                                <label class="product-size-option">
+                                    <input type="radio"
+                                           name="selected_size"
+                                           value="{{ option.value }}"
+                                           data-price="{{ option.price }}"
+                                           data-unit-label="{{ option.unit_label }}"
+                                           {% if forloop.first %}checked{% endif %}>
+                                    <span class="product-size-pill">
+                                        <strong>{{ option.label }}</strong>
+                                        <span>&#8369;{{ option.price }}</span>
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
                         <div class="product-detail-actions">
                             <div class="product-quantity-box">
-                                <label for="quantity" class="form-label" style="display: block; font-weight: 700; color: #333; margin-bottom: 0.4rem;">Quantity (kg)</label>
+                                <label for="quantity" class="form-label" id="quantityLabel" style="display: block; font-weight: 700; color: #333; margin-bottom: 0.4rem;">Quantity ({% if default_cup_option %}{{ default_cup_option.unit_label }}{% else %}{{ product.unit_label }}{% endif %})</label>
                                 <div class="product-quantity-controls">
                                     <button type="button" onclick="const q=document.getElementById('quantity'); if(q) { q.stepDown(); if(parseInt(q.value) < parseInt(q.min)) q.value = q.min; }" class="product-quantity-button" style="font-size: 1.5rem;">-</button>
                                     <input type="number" id="quantity" name="quantity" value="1" min="1" step="1" max="{{ product.stock_quantity }}" class="product-quantity-input">
@@ -301,4 +371,40 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const sizeInputs = document.querySelectorAll('input[name="selected_size"]');
+    if (!sizeInputs.length) {
+        return;
+    }
+
+    const priceValue = document.getElementById('productPriceValue');
+    const priceUnit = document.getElementById('productPriceUnit');
+    const quantityLabel = document.getElementById('quantityLabel');
+
+    function syncSize(input) {
+        const price = input.getAttribute('data-price');
+        const unitLabel = input.getAttribute('data-unit-label');
+        if (priceValue) {
+            priceValue.innerHTML = '&#8369;' + price;
+        }
+        if (priceUnit) {
+            priceUnit.textContent = 'per ' + unitLabel.toLowerCase() + ' - min 1';
+        }
+        if (quantityLabel) {
+            quantityLabel.textContent = 'Quantity (' + unitLabel + ')';
+        }
+    }
+
+    sizeInputs.forEach((input) => {
+        if (input.checked) {
+            syncSize(input);
+        }
+        input.addEventListener('change', () => syncSize(input));
+    });
+})();
+</script>
 {% endblock %}

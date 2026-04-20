@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}{{ order.order_code }} - SOFIA'S FRUIT STORE{% endblock %}
 
@@ -158,11 +158,14 @@
                         <div style="flex: 1;">
                             <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.product.name }}</h5>
                             <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">{{ item.product.category.name }}</p>
+                            {% if item.selected_size %}
+                            <p style="color: var(--primary-green); margin: -0.4rem 0 1rem; font-size: 0.9rem; font-weight: 700;">Selected: {{ item.display_selected_label }}</p>
+                            {% endif %}
                             
                             <div class="order-item-meta">
                                 <span style="color: #666;">Qty: <strong>{{ item.quantity }}</strong></span>
-                                <span style="color: #666;">Price: <strong>₱{{ item.product.price }}</strong></span>
-                                <span style="font-weight: 700; color: var(--primary-green); font-size: 1.1rem;">₱{{ item.subtotal }}</span>
+                                <span style="color: #666;">Price: <strong>₱{{ item.unit_price }}</strong></span>
+                                <span style="font-weight: 700; color: var(--primary-green); font-size: 1.1rem;">&#8369;{{ item.subtotal }}</span>
                             </div>
                         </div>
                     </div>
@@ -184,15 +187,15 @@
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Subtotal</span>
-                            <span style="font-weight: 600;">₱{{ subtotal_price }}</span>
+                            <span style="font-weight: 600;">&#8369;{{ subtotal_price }}</span>
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Shipping</span>
-                            <span style="font-weight: 600;">₱{{ shipping_fee }}</span>
+                            <span style="font-weight: 600;">&#8369;{{ shipping_fee }}</span>
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Total</span>
-                            <span style="font-weight: 600;">₱{{ order.total_price }}</span>
+                            <span style="font-weight: 600;">&#8369;{{ order.total_price }}</span>
                         </div>
                     </div>
                     

@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$SCRIPT_DIR/fruit_store"
+PROJECT_DIR="$SCRIPT_DIR"
 
 echo "Fruit Store - Quick Start Setup"
 echo "===================================="
@@ -11,7 +11,7 @@ echo
 cd "$PROJECT_DIR"
 
 echo "Step 1: Installing dependencies..."
-python -m pip install -r "$SCRIPT_DIR/requirements.txt"
+python -m pip install -r "$PROJECT_DIR/requirements.txt"
 echo "Dependencies installed"
 echo
 

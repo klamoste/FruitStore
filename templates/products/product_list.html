@@ -307,11 +307,20 @@
                         <p class="product-card-copy">{{ product.description|truncatewords:12 }}</p>
                         <div class="product-card-footer">
                             <div>
-                                <div class="product-card-price">&#8369;{{ product.price }} / kg</div>
+                                <div class="product-card-price">
+                                    {% if product.available_cup_sizes %}
+                                    &#8369;{{ product.available_cup_sizes.0.price }}+ / Cup
+                                    {% else %}
+                                    &#8369;{{ product.price }} / {{ product.unit_label }}
+                                    {% endif %}
+                                </div>
                             </div>
                             <form method="post" action="{% url 'products:add_to_cart' product.id %}" style="margin: 0;">
                                 {% csrf_token %}
                                 <input type="hidden" name="quantity" value="1" />
+                                {% if product.available_cup_sizes %}
+                                <input type="hidden" name="selected_size" value="{{ product.available_cup_sizes.0.value }}" />
+                                {% endif %}
                                 <button type="submit" class="btn-primary-custom product-card-add">
                                     <i class="fas fa-cart-plus"></i>
                                     Add
@@ -326,8 +335,13 @@
             <div class="col-12">
                 <div style="text-align: center; padding: 3rem; background: var(--light-bg); border-radius: 1.5rem;">
                     <i class="fas fa-ban" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem; display: block;"></i>
+                    {% if catalog_unavailable %}
+                    <h4 style="color: #444; margin-bottom: 0.75rem;">Product catalog unavailable</h4>
+                    <p style="color: #777; margin-bottom: 0;">The catalog is temporarily unavailable while the database finishes connecting. Please try again in a moment.</p>
+                    {% else %}
                     <h4 style="color: #444; margin-bottom: 0.75rem;">No fruits found</h4>
                     <p style="color: #777;">Try selecting a different category or modifying your search.</p>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
