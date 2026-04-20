@@ -266,6 +266,9 @@
         <div>
             <h1 class="products-heading">Our Fresh Fruits</h1>
             <p style="color: #666; font-size: 1rem; margin: 0;">{{ products|length }} products available</p>
+            {% if catalog_readonly %}
+            <p style="color: #8a6d1f; font-size: 0.95rem; margin: 0.5rem 0 0;">Showing demo catalog while the live database is unavailable.</p>
+            {% endif %}
         </div>
         <form method="get" class="d-flex align-items-center gap-2 products-search">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..." class="products-search-input">
@@ -321,10 +324,17 @@
                                 {% if product.available_cup_sizes %}
                                 <input type="hidden" name="selected_size" value="{{ product.available_cup_sizes.0.value }}" />
                                 {% endif %}
+                                {% if catalog_readonly %}
+                                <a href="{% url 'products:product_detail' product.id %}" class="btn-primary-custom product-card-add" style="text-decoration: none;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </a>
+                                {% else %}
                                 <button type="submit" class="btn-primary-custom product-card-add">
                                     <i class="fas fa-cart-plus"></i>
                                     Add
                                 </button>
+                                {% endif %}
                             </form>
                         </div>
                     </div>

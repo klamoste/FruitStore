@@ -91,8 +91,16 @@ class ProductViewsTests(TestCase):
             response = self.client.get(reverse('products:product_list'), follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Product catalog unavailable')
-        self.assertContains(response, 'database finishes connecting')
+        self.assertContains(response, 'Showing demo catalog while the live database is unavailable.')
+        self.assertContains(response, 'Fresh Apples')
+
+    def test_product_detail_uses_fallback_catalog_when_database_errors(self):
+        with patch('products_app.views.get_object_or_404', side_effect=DatabaseError('boom')):
+            response = self.client.get(reverse('products:product_detail', args=[1]), follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Fresh Apples')
+        self.assertContains(response, 'Preview only while the live database is unavailable')
 
     def test_add_to_cart_requires_login(self):
         product = Product.objects.get(name='Apple')
