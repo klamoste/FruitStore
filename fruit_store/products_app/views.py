@@ -67,6 +67,7 @@ def product_list(request):
         paginator = Paginator(products, 12)
         page = request.GET.get('page', 1)
         products = paginator.get_page(page)
+        products.object_list = list(products.object_list)
     except DatabaseError:
         products = []
         categories = []
