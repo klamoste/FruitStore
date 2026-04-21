@@ -273,7 +273,7 @@
                                 <div class="payment-option-content">
                                     <div class="payment-option-title">{{ radio.choice_label }}</div>
                                     <div class="payment-option-description">
-                                        {% if radio.choice_value == 'COD' %}
+                                        {% if "COD" in radio.data.value %}
                                             Pay cash when your fruits are delivered to your door.
                                         {% else %}
                                             Use GCash to pay quickly and securely.
