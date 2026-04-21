@@ -442,3 +442,30 @@
 </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const scrollKey = 'fruit-store-cart-scroll';
+        const quantityForms = document.querySelectorAll('.cart-quantity-form, .cart-size-form');
+
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        const savedScroll = sessionStorage.getItem(scrollKey);
+        if (savedScroll !== null) {
+            window.addEventListener('load', function restoreScroll() {
+                window.scrollTo(0, parseInt(savedScroll, 10) || 0);
+                sessionStorage.removeItem(scrollKey);
+            }, { once: true });
+        }
+
+        quantityForms.forEach(function (form) {
+            form.addEventListener('submit', function () {
+                sessionStorage.setItem(scrollKey, String(window.scrollY));
+            });
+        });
+    })();
+</script>
+{% endblock %}
