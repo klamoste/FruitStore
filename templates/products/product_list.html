@@ -27,6 +27,51 @@
         max-width: 420px;
     }
 
+    .products-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.15rem;
+        border-radius: 1.5rem;
+        background: linear-gradient(180deg, #ffffff 0%, #f5fbf6 100%);
+        box-shadow: 0 12px 28px rgba(19, 44, 33, 0.08);
+    }
+
+    .products-toolbar-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .products-toolbar-label {
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #63816d;
+    }
+
+    .products-sort-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .products-sort-select {
+        min-width: 190px;
+        padding: 0.8rem 2.75rem 0.8rem 1rem;
+        border: 1px solid rgba(45, 122, 90, 0.18);
+        border-radius: 999px;
+        background: #fff;
+        color: #284736;
+        font-weight: 700;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+    }
+
     .products-search-input {
         width: 100%;
         padding: 0.85rem 1rem;
@@ -41,7 +86,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.75rem;
-        margin-bottom: 2rem;
+        margin: 0;
     }
 
     .category-filter-pill {
@@ -89,7 +134,7 @@
 
     .product-card-image {
         width: 100%;
-        height: 260px;
+        aspect-ratio: 1 / 1;
         object-fit: cover;
         display: block;
     }
@@ -110,6 +155,8 @@
 
     .product-card-body {
         padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
     }
 
     .product-card-title {
@@ -125,6 +172,7 @@
         line-height: 1.5;
         min-height: 60px;
         margin-bottom: 1.4rem;
+        flex-grow: 1;
     }
 
     .product-card-footer {
@@ -170,6 +218,25 @@
             max-width: none;
         }
 
+        .products-toolbar {
+            padding: 1rem;
+        }
+
+        .products-toolbar,
+        .products-toolbar-group,
+        .products-sort-form {
+            width: 100%;
+        }
+
+        .products-sort-form {
+            justify-content: space-between;
+        }
+
+        .products-sort-select {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
         .category-filter-bar {
             gap: 0.6rem;
             margin-bottom: 1.5rem;
@@ -178,10 +245,6 @@
         .products-search form,
         .products-search {
             width: 100%;
-        }
-
-        .product-card-image {
-            height: 220px;
         }
 
         .product-card-body {
@@ -194,8 +257,8 @@
         }
 
         .products-grid {
-            --bs-gutter-x: 1rem;
-            --bs-gutter-y: 1rem;
+            --bs-gutter-x: 0.85rem;
+            --bs-gutter-y: 0.95rem;
         }
     }
 
@@ -214,6 +277,22 @@
             align-items: stretch !important;
         }
 
+        .products-toolbar {
+            gap: 0.85rem;
+            padding: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .products-toolbar-group {
+            gap: 0.55rem;
+        }
+
+        .products-sort-form {
+            gap: 0.6rem;
+            align-items: stretch;
+            flex-direction: column;
+        }
+
         .category-filter-bar {
             overflow-x: auto;
             flex-wrap: nowrap;
@@ -230,12 +309,9 @@
         }
 
         .products-search-input,
-        .products-search button {
+        .products-search button,
+        .products-sort-select {
             width: 100%;
-        }
-
-        .product-card-image {
-            height: 190px;
         }
 
         .product-card-badge {
@@ -245,15 +321,45 @@
             padding: 0.35rem 0.7rem;
         }
 
+        .products-grid {
+            --bs-gutter-x: 0.75rem;
+            --bs-gutter-y: 0.85rem;
+        }
+
+        .product-card {
+            border-radius: 1.15rem;
+        }
+
+        .product-card-body {
+            padding: 0.95rem;
+        }
+
+        .product-card-title {
+            font-size: 0.96rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .product-card-copy {
+            font-size: 0.84rem;
+            line-height: 1.35;
+            margin-bottom: 0.8rem;
+        }
+
         .product-card-footer {
             align-items: stretch;
             gap: 0.85rem;
             flex-direction: column;
         }
 
+        .product-card-price {
+            font-size: 1.05rem;
+        }
+
         .product-card-add {
             width: 100%;
             justify-content: center;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.88rem;
         }
     }
 </style>
@@ -273,27 +379,43 @@
         <form method="get" class="d-flex align-items-center gap-2 products-search">
             <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..." class="products-search-input">
             {% if category_id %}<input type="hidden" name="category" value="{{ category_id }}">{% endif %}
+            {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
             <button type="submit" class="btn-primary-custom" style="padding: 0.85rem 1.5rem; border-radius: 999px;">Search</button>
         </form>
     </div>
 
-    <div class="category-filter-bar">
-        <a href="{% url 'products:product_list' %}{% if query %}?q={{ query|urlencode }}{% endif %}"
-           class="category-filter-pill {% if not category_id %}active{% endif %}">
-            All
-        </a>
-        {% for category in categories %}
-        <a href="{% url 'products:product_list' %}?category={{ category.id }}{% if query %}&q={{ query|urlencode }}{% endif %}"
-           class="category-filter-pill {% if category_id == category.id|stringformat:'s' %}active{% endif %}">
-            {{ category.name }}
-        </a>
-        {% endfor %}
+    <div class="products-toolbar">
+        <div class="products-toolbar-group">
+            <span class="products-toolbar-label">Filter</span>
+            <div class="category-filter-bar">
+                <a href="{% url 'products:product_list' %}?sort={{ sort }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+                   class="category-filter-pill {% if not category_id %}active{% endif %}">
+                    All
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'products:product_list' %}?category={{ category.id }}&sort={{ sort }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+                   class="category-filter-pill {% if category_id == category.id|stringformat:'s' %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <form method="get" class="products-sort-form">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            {% if category_id %}<input type="hidden" name="category" value="{{ category_id }}">{% endif %}
+            <label for="sort" class="products-toolbar-label">Sort</label>
+            <select id="sort" name="sort" class="products-sort-select" onchange="this.form.submit()">
+                {% for sort_value, sort_label in sort_options.items %}
+                <option value="{{ sort_value }}"{% if sort == sort_value %} selected{% endif %}>{{ sort_label }}</option>
+                {% endfor %}
+            </select>
+        </form>
     </div>
 
     <div class="row gx-4 gy-4 products-grid">
         {% if products %}
             {% for product in products %}
-            <div class="col-sm-6 col-xl-3">
+            <div class="col-6 col-lg-4 col-xl-3">
                 <div class="card h-100 product-card"
                      onmouseover="this.style.transform='translateY(-7px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.12)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.08)';">

@@ -164,12 +164,23 @@ def product_list(request):
     """Display all products with search and filter functionality."""
     query = request.GET.get('q', '')
     category_id = request.GET.get('category', '')
+    sort = request.GET.get('sort', 'featured')
     catalog_unavailable = False
     catalog_readonly = False
 
+    sort_options = {
+        'featured': 'Featured',
+        'name_asc': 'Name: A to Z',
+        'name_desc': 'Name: Z to A',
+        'price_low': 'Price: Low to High',
+        'price_high': 'Price: High to Low',
+    }
+    if sort not in sort_options:
+        sort = 'featured'
+
     try:
         ensure_sample_catalog()
-        products = Product.objects.filter(is_available=True).order_by('name')
+        products = Product.objects.filter(is_available=True)
         categories = list(Category.objects.order_by('name'))
         category_names = [category.name for category in categories]
         if 'Beverages' in category_names and 'Fresh Fruits' in category_names:
@@ -196,6 +207,17 @@ def product_list(request):
             products = products.filter(price__gte=min_price)
         if max_price:
             products = products.filter(price__lte=max_price)
+
+        if sort == 'name_asc':
+            products = products.order_by('name')
+        elif sort == 'name_desc':
+            products = products.order_by('-name')
+        elif sort == 'price_low':
+            products = products.order_by('price', 'name')
+        elif sort == 'price_high':
+            products = products.order_by('-price', 'name')
+        else:
+            products = products.order_by('-created_at', 'name')
         
         paginator = Paginator(products, 12)
         page = request.GET.get('page', 1)
@@ -225,6 +247,15 @@ def product_list(request):
                     if product.category.name == selected_category.name
                 ]
 
+        if sort == 'name_asc':
+            products.sort(key=lambda product: product.name.lower())
+        elif sort == 'name_desc':
+            products.sort(key=lambda product: product.name.lower(), reverse=True)
+        elif sort == 'price_low':
+            products.sort(key=lambda product: (product.price, product.name.lower()))
+        elif sort == 'price_high':
+            products.sort(key=lambda product: (-product.price, product.name.lower()))
+
         paginator = Paginator(products, 12)
         page = request.GET.get('page', 1)
         products = paginator.get_page(page)
@@ -235,6 +266,8 @@ def product_list(request):
         'categories': categories,
         'query': query,
         'category_id': category_id,
+        'sort': sort,
+        'sort_options': sort_options,
         'catalog_unavailable': catalog_unavailable,
         'catalog_readonly': catalog_readonly,
     }
