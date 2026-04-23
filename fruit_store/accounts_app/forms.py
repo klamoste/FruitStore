@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+import re
 from .models import Profile
 
 
@@ -46,7 +47,17 @@ class ProfileEditForm(forms.Form):
     first_name = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First name'}))
     last_name = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last name'}))
     address = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Street address'}))
-    contact_number = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone number'}))
+    contact_number = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Phone number',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]+',
+            'autocomplete': 'tel',
+            'maxlength': '30',
+        })
+    )
     city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}))
     state = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'State or province'}))
     avatar_mode = forms.ChoiceField(
@@ -81,6 +92,15 @@ class ProfileEditForm(forms.Form):
 
     def clean_email(self):
         return self.cleaned_data['email']
+
+    def clean_contact_number(self):
+        contact_number = (self.cleaned_data.get('contact_number') or '').strip()
+        if not contact_number:
+            return ''
+        normalized_number = re.sub(r'[\s\-()+]', '', contact_number)
+        if not normalized_number.isdigit():
+            raise forms.ValidationError('Phone number must contain numbers only.')
+        return contact_number
 
     def clean_avatar_mode(self):
         return self.cleaned_data.get('avatar_mode') or 'template'

@@ -866,6 +866,13 @@ function confirmDeleteAccount() {
         return clean || fallback;
     };
 
+    const sanitizePhoneNumber = () => {
+        if (!refs.phone) {
+            return;
+        }
+        refs.phone.value = refs.phone.value.replace(/\D+/g, '');
+    };
+
     const render = () => {
         const fullName = `${refs.firstName?.value || ''} ${refs.lastName?.value || ''}`.trim();
         const username = refs.username?.value || '';
@@ -907,7 +914,12 @@ function confirmDeleteAccount() {
         }
     };
 
-    form.addEventListener('input', render);
+    form.addEventListener('input', (event) => {
+        if (event.target === refs.phone) {
+            sanitizePhoneNumber();
+        }
+        render();
+    });
     form.addEventListener('change', render);
 
     if (resetButton) {
