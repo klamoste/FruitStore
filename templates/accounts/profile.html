@@ -873,6 +873,8 @@ function confirmDeleteAccount() {
         refs.phone.value = refs.phone.value.replace(/\D+/g, '').slice(0, 15);
     };
 
+    const hasValidPhoneNumber = (value) => /^\d{11,15}$/.test((value || '').trim());
+
     const render = () => {
         const fullName = `${refs.firstName?.value || ''} ${refs.lastName?.value || ''}`.trim();
         const username = refs.username?.value || '';
@@ -889,7 +891,13 @@ function confirmDeleteAccount() {
         if (refs.cityText) refs.cityText.textContent = textOrFallback(city, '-');
 
         const missing = requiredFields
-            .filter((field) => !field.getValue().trim())
+            .filter((field) => {
+                const value = field.getValue().trim();
+                if (field.label === 'Phone') {
+                    return !hasValidPhoneNumber(value);
+                }
+                return !value;
+            })
             .map((field) => field.label);
         const total = requiredFields.length;
         const completed = total - missing.length;
