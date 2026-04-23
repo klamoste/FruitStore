@@ -870,7 +870,7 @@ function confirmDeleteAccount() {
         if (!refs.phone) {
             return;
         }
-        refs.phone.value = refs.phone.value.replace(/\D+/g, '');
+        refs.phone.value = refs.phone.value.replace(/\D+/g, '').slice(0, 15);
     };
 
     const render = () => {

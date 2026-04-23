@@ -53,9 +53,10 @@ class ProfileEditForm(forms.Form):
             'class': 'form-control',
             'placeholder': 'Phone number',
             'inputmode': 'numeric',
-            'pattern': '[0-9]+',
+            'pattern': '[0-9]{10,15}',
             'autocomplete': 'tel',
-            'maxlength': '30',
+            'minlength': '10',
+            'maxlength': '15',
         })
     )
     city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'City'}))
@@ -97,10 +98,12 @@ class ProfileEditForm(forms.Form):
         contact_number = (self.cleaned_data.get('contact_number') or '').strip()
         if not contact_number:
             return ''
-        normalized_number = re.sub(r'[\s\-()+]', '', contact_number)
-        if not normalized_number.isdigit():
+        normalized_number = re.sub(r'\D+', '', contact_number)
+        if normalized_number != contact_number:
             raise forms.ValidationError('Phone number must contain numbers only.')
-        return contact_number
+        if not 10 <= len(normalized_number) <= 15:
+            raise forms.ValidationError('Phone number must be between 10 and 15 digits.')
+        return normalized_number
 
     def clean_avatar_mode(self):
         return self.cleaned_data.get('avatar_mode') or 'template'
