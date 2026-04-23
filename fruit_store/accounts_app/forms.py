@@ -53,9 +53,9 @@ class ProfileEditForm(forms.Form):
             'class': 'form-control',
             'placeholder': 'Phone number',
             'inputmode': 'numeric',
-            'pattern': '[0-9]{10,15}',
+            'pattern': '[0-9]{11,15}',
             'autocomplete': 'tel',
-            'minlength': '10',
+            'minlength': '11',
             'maxlength': '15',
         })
     )
@@ -101,8 +101,8 @@ class ProfileEditForm(forms.Form):
         normalized_number = re.sub(r'\D+', '', contact_number)
         if normalized_number != contact_number:
             raise forms.ValidationError('Phone number must contain numbers only.')
-        if not 10 <= len(normalized_number) <= 15:
-            raise forms.ValidationError('Phone number must be between 10 and 15 digits.')
+        if not 11 <= len(normalized_number) <= 15:
+            raise forms.ValidationError('Phone number must be between 11 and 15 digits.')
         return normalized_number
 
     def clean_avatar_mode(self):
