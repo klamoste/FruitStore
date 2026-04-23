@@ -62,7 +62,6 @@
                         <div>
                             <h5 style="font-weight: 700; margin-bottom: 0.35rem;">{{ order.order_code }}</h5>
                             <p style="color: #999; margin: 0; font-size: 0.9rem;">Placed {{ order.created_at|date:"M d, Y" }}</p>
-                            <p style="color: #999; margin: 0.3rem 0 0; font-size: 0.85rem;">Internal ref: #{{ order.id }}</p>
                         </div>
                         <span style="background: var(--light-green); color: white; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
                             {{ order.status|upper }}
