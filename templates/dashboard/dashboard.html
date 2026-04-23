@@ -207,8 +207,8 @@
                                     <td style="padding: 1rem; font-weight: 600; color: var(--primary-green);">&#8369;{{ account.total_spent|floatformat:2 }}</td>
                                     <td style="padding: 1rem;">{{ account.is_staff|yesno:"Yes,No" }}</td>
                                     <td style="padding: 1rem;">{{ account.is_superuser|yesno:"Yes,No" }}</td>
-                                    <td style="padding: 1rem;">{{ account.date_joined|date:"Y-m-d H:i" }}</td>
-                                    <td style="padding: 1rem;">{{ account.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                                    <td style="padding: 1rem;">{{ account.date_joined|date:"M d, Y P" }}</td>
+                                    <td style="padding: 1rem;">{{ account.last_login|date:"M d, Y P"|default:"Never" }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

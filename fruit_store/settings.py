@@ -165,7 +165,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Default to the store's local timezone instead of UTC so rendered timestamps
+# in templates and admin views match the business locale.
+TIME_ZONE = os.environ.get('APP_TIME_ZONE', 'Asia/Manila').strip() or 'Asia/Manila'
 
 USE_I18N = True
 
