@@ -137,7 +137,7 @@ def checkout(request):
                 user=request.user,
                 customer_note=customer_note,
                 total_price=final_total,
-                status='paid' if payment_method == 'PAID' else 'pending'
+                status='paid' if payment_method == 'GCASH' else 'pending'
             )
             
             # Create order items and update inventory

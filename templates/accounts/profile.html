@@ -223,7 +223,10 @@
                             </div>
                             <div class="profile-actions">
                                 <a href="{% url 'orders:order_history' %}" class="btn btn-outline-success">View Orders</a>
-                                <a href="{% url 'accounts:logout' %}" class="btn btn-danger">Logout</a>
+                                <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Logout</button>
+                                </form>
                             </div>
                         </div>
                     </div>
