@@ -124,22 +124,50 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Created product: {product.name}'))
 
         # Create test users
-        if not User.objects.filter(username='admin').exists():
+        admin_user = User.objects.filter(username='admin').first()
+        if not admin_user:
             admin_user = User.objects.create_superuser(
                 username='admin',
                 email='admin@fruitstore.com',
                 password='admin123'
             )
-            Profile.objects.create(user=admin_user, role='admin')
             self.stdout.write(self.style.SUCCESS('Created admin user: admin / admin123'))
+        admin_user.first_name = 'Sofia'
+        admin_user.last_name = 'Admin'
+        admin_user.email = 'admin@fruitstore.com'
+        admin_user.save()
+        Profile.objects.update_or_create(
+            user=admin_user,
+            defaults={
+                'role': 'admin',
+                'address': 'Cor. Carlota and Naldoza St., Purok Quezon',
+                'contact_number': '09213382336',
+                'city': 'Bacuag',
+                'state': 'Surigao del Norte',
+            }
+        )
 
-        if not User.objects.filter(username='testuser').exists():
+        test_user = User.objects.filter(username='testuser').first()
+        if not test_user:
             test_user = User.objects.create_user(
                 username='testuser',
                 email='test@fruitstore.com',
                 password='testuser123'
             )
-            Profile.objects.create(user=test_user, role='customer')
             self.stdout.write(self.style.SUCCESS('Created test user: testuser / testuser123'))
+        test_user.first_name = 'Test'
+        test_user.last_name = 'Customer'
+        test_user.email = 'test@fruitstore.com'
+        test_user.save()
+        Profile.objects.update_or_create(
+            user=test_user,
+            defaults={
+                'role': 'customer',
+                'address': '123 Mango Street',
+                'contact_number': '09123456789',
+                'city': 'Bacuag',
+                'state': 'Surigao del Norte',
+            }
+        )
 
         self.stdout.write(self.style.SUCCESS('Sample data created successfully!'))

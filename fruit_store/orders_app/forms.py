@@ -1,5 +1,6 @@
 from django import forms
 from datetime import time
+import re
 from django.utils import timezone
 from .models import Order
 
@@ -33,6 +34,8 @@ class PaymentForm(forms.Form):
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter the GCash account name used for payment.',
+                'inputmode': 'text',
+                'autocomplete': 'name',
             }
         ),
         label='GCash Sender Name',
@@ -44,6 +47,9 @@ class PaymentForm(forms.Form):
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter your GCash reference number.',
+                'inputmode': 'numeric',
+                'pattern': '[0-9]*',
+                'autocomplete': 'off',
             }
         ),
         label='GCash Reference Number',
@@ -98,13 +104,17 @@ class PaymentForm(forms.Form):
         cleaned_data = super().clean()
         payment_method = cleaned_data.get('payment_method')
         sender_name = (cleaned_data.get('gcash_sender_name') or '').strip()
-        reference = (cleaned_data.get('gcash_reference') or '').strip().upper()
+        reference = (cleaned_data.get('gcash_reference') or '').strip()
 
         if payment_method == Order.PAYMENT_METHOD_GCASH:
             if not sender_name:
                 self.add_error('gcash_sender_name', 'Enter the GCash sender name used for this payment.')
+            elif not re.fullmatch(r"[A-Za-z ]+", sender_name):
+                self.add_error('gcash_sender_name', 'GCash sender name must contain letters only.')
             if not reference:
                 self.add_error('gcash_reference', 'Enter the GCash reference number before placing the order.')
+            elif not reference.isdigit():
+                self.add_error('gcash_reference', 'GCash reference number must contain numbers only.')
         else:
             sender_name = ''
             reference = ''

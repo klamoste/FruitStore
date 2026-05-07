@@ -205,6 +205,7 @@ def checkout(request):
             total_price += subtotal
             cart_items.append({
                 'product': product,
+                'product_id': product.id,
                 'quantity': quantity,
                 'unit_price': Decimal(item['price']),
                 'selected_size': selected_size,
@@ -233,41 +234,77 @@ def checkout(request):
             
             # Create order
             try:
-                order = Order.objects.create(
-                    user=request.user,
-                    payment_method=payment_method,
-                    gcash_sender_name=gcash_sender_name,
-                    gcash_reference=gcash_reference,
-                    customer_note=customer_note,
-                    requested_delivery_date=requested_delivery_date,
-                    requested_delivery_time=requested_delivery_time,
-                    total_price=final_total,
-                    status='paid' if payment_method == Order.PAYMENT_METHOD_GCASH else 'pending'
-                )
-                
-                for item in cart_items:
-                    product = item['product']
-                    quantity = item['quantity']
-                    subtotal = item['subtotal']
-                    
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        quantity=quantity,
-                        unit_price=item['unit_price'],
-                        selected_size=item['selected_size'],
-                        selected_unit_label=item['selected_label'],
-                        subtotal=subtotal
+                with transaction.atomic():
+                    locked_products = {
+                        product.id: product
+                        for product in Product.objects.select_for_update().filter(
+                            id__in=[item['product_id'] for item in cart_items]
+                        )
+                    }
+
+                    missing_product_ids = [
+                        item['product_id']
+                        for item in cart_items
+                        if item['product_id'] not in locked_products
+                    ]
+                    if missing_product_ids:
+                        messages.error(
+                            request,
+                            'Some items in your cart are no longer available. Please review your cart and try again.'
+                        )
+                        return redirect('orders:cart')
+
+                    stock_errors = []
+                    for item in cart_items:
+                        locked_product = locked_products[item['product_id']]
+                        if not locked_product.is_available:
+                            stock_errors.append(f'{locked_product.name} is no longer available.')
+                            continue
+                        if item['quantity'] > locked_product.stock_quantity:
+                            stock_errors.append(
+                                f'{locked_product.name} only has {locked_product.stock_quantity} left in stock.'
+                            )
+
+                    if stock_errors:
+                        for error in stock_errors:
+                            messages.error(request, error)
+                        return redirect('orders:cart')
+
+                    order = Order.objects.create(
+                        user=request.user,
+                        payment_method=payment_method,
+                        gcash_sender_name=gcash_sender_name,
+                        gcash_reference=gcash_reference,
+                        customer_note=customer_note,
+                        requested_delivery_date=requested_delivery_date,
+                        requested_delivery_time=requested_delivery_time,
+                        total_price=final_total,
+                        status='paid' if payment_method == Order.PAYMENT_METHOD_GCASH else 'pending'
                     )
                     
-                    product.stock_quantity -= quantity
-                    product.save()
-                    
-                    InventoryLog.objects.create(
-                        product=product,
-                        change=-quantity,
-                        reason='sale'
-                    )
+                    for item in cart_items:
+                        product = locked_products[item['product_id']]
+                        quantity = item['quantity']
+                        subtotal = item['subtotal']
+                        
+                        OrderItem.objects.create(
+                            order=order,
+                            product=product,
+                            quantity=quantity,
+                            unit_price=item['unit_price'],
+                            selected_size=item['selected_size'],
+                            selected_unit_label=item['selected_label'] or item['unit_label'],
+                            subtotal=subtotal
+                        )
+                        
+                        product.stock_quantity -= quantity
+                        product.save(update_fields=['stock_quantity', 'updated_at'])
+                        
+                        InventoryLog.objects.create(
+                            product=product,
+                            change=-quantity,
+                            reason='sale'
+                        )
             except DatabaseError:
                 messages.error(
                     request,
