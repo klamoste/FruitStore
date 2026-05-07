@@ -22,13 +22,21 @@ class Profile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='customer')
+    avatar_mode = models.CharField(
+        max_length=10,
+        choices=AVATAR_MODE_CHOICES,
+        default='template',
+    )
+    avatar_template = models.CharField(
+        max_length=20,
+        choices=AVATAR_TEMPLATE_CHOICES,
+        default='leaf',
+    )
+    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
     address = models.CharField(max_length=255, blank=True)
     contact_number = models.CharField(max_length=30, blank=True)
     city = models.CharField(max_length=100, blank=True)
     state = models.CharField(max_length=100, blank=True)
-    avatar_mode = models.CharField(max_length=10, choices=AVATAR_MODE_CHOICES, default='template')
-    avatar_template = models.CharField(max_length=20, choices=AVATAR_TEMPLATE_CHOICES, default='leaf')
-    profile_image = models.ImageField(upload_to='profiles/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"
