@@ -66,6 +66,8 @@
                                 <tr style="border-bottom: 2px solid #eee;">
                                     <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Order</th>
                                     <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Customer</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Payment</th>
+                                    <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Delivery Schedule</th>
                                     <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Amount</th>
                                     <th style="text-align: left; padding: 1rem; font-weight: 700; color: #666;">Status</th>
                                 </tr>
@@ -75,6 +77,8 @@
                                 <tr style="border-bottom: 1px solid #eee;">
                                     <td style="padding: 1rem; font-weight: 600;">{{ order.order_code }}</td>
                                     <td style="padding: 1rem;">{{ order.user.get_full_name|default:order.user.username }}</td>
+                                    <td style="padding: 1rem;">{{ order.get_payment_method_display }}{% if order.payment_method == 'GCASH' and order.gcash_reference %}<div style="font-size: 0.85rem; color: #777; margin-top: 0.25rem;">{{ order.gcash_reference }}</div>{% endif %}</td>
+                                    <td style="padding: 1rem;">{{ order.requested_delivery_date|date:"M d, Y" }}<div style="font-size: 0.85rem; color: #777; margin-top: 0.25rem;">{{ order.requested_delivery_day }} - {{ order.requested_delivery_period_display }}</div></td>
                                     <td style="padding: 1rem; font-weight: 600; color: var(--primary-green);">&#8369;{{ order.total_price }}</td>
                                     <td style="padding: 1rem;">
                                         <span style="background: var(--light-green); color: white; padding: 0.3rem 0.7rem; border-radius: 15px; font-size: 0.85rem;">
@@ -207,8 +211,8 @@
                                     <td style="padding: 1rem; font-weight: 600; color: var(--primary-green);">&#8369;{{ account.total_spent|floatformat:2 }}</td>
                                     <td style="padding: 1rem;">{{ account.is_staff|yesno:"Yes,No" }}</td>
                                     <td style="padding: 1rem;">{{ account.is_superuser|yesno:"Yes,No" }}</td>
-                                    <td style="padding: 1rem;">{{ account.date_joined|date:"Y-m-d H:i" }}</td>
-                                    <td style="padding: 1rem;">{{ account.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
+                                    <td style="padding: 1rem;">{{ account.date_joined|date:"M d, Y P" }}</td>
+                                    <td style="padding: 1rem;">{{ account.last_login|date:"M d, Y P"|default:"Never" }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

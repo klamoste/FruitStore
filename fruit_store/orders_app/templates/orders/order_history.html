@@ -24,7 +24,7 @@
                         {% for order in orders %}
                             <tr>
                                 <td><strong>#{{ order.id }}</strong></td>
-                                <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                                <td>{{ order.created_at|date:"M d, Y P" }}</td>
                                 <td>{{ order.orderitem_set.count }} item(s)</td>
                                 <td class="text-success"><strong>₱{{ order.total_price }}</strong></td>
                                 <td>

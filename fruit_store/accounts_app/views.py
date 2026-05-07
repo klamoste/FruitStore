@@ -5,16 +5,19 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.db.models import Sum
+import re
 from .forms import RegisterForm, LoginForm, ProfileEditForm
 from .models import Profile
 
 
 def get_profile_completion_data(user, profile):
+    phone = (profile.contact_number or '').strip()
+    valid_phone = bool(re.fullmatch(r'\d{11,15}', phone))
     summary_fields = [
         ('Full Name', user.get_full_name()),
         ('Username', user.username),
         ('Email', user.email),
-        ('Phone', profile.contact_number),
+        ('Phone', phone if valid_phone else ''),
         ('Address', profile.address),
         ('City', profile.city),
     ]
