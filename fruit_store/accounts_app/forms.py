@@ -49,3 +49,5 @@ class ProfileEditForm(forms.Form):
     city = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     state = forms.CharField(required=False, widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(required=False, widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+
+

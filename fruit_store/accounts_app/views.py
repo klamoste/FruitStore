@@ -48,6 +48,8 @@ def login_view(request):
 
 
 def logout_view(request):
+    if request.method != 'POST':
+        return redirect('accounts:profile' if request.user.is_authenticated else 'accounts:login')
     logout(request)
     messages.success(request, 'You have been logged out.')
     return redirect('accounts:login')
@@ -104,3 +106,16 @@ def profile(request):
         'order_count': order_count,
         'total_spent': total_spent,
     })
+
+
+@login_required(login_url='accounts:login')
+def delete_account(request):
+    if request.method == 'POST':
+        if request.POST.get('confirm') == 'yes':
+            user = request.user
+            logout(request)
+            user.delete()
+            messages.success(request, 'Your account has been deleted.')
+            return redirect('products:home')
+        messages.error(request, 'Please confirm account deletion.')
+    return redirect('accounts:profile')
