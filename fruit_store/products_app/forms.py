@@ -43,7 +43,16 @@ class AddToCartForm(forms.Form):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ('name', 'description', 'category', 'price', 'stock_quantity', 'unit', 'image', 'is_available')
+        fields = (
+            'name',
+            'description',
+            'category',
+            'price',
+            'stock_quantity',
+            'unit',
+            'image',
+            'is_available',
+        )
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),

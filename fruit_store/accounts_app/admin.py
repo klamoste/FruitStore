@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
+from admin_utils import DatabaseSafeAdminMixin
 from .models import Profile
 
 
@@ -12,7 +13,7 @@ class ProfileInline(admin.StackedInline):
     fk_name = 'user'
 
 
-class CustomUserAdmin(UserAdmin):
+class CustomUserAdmin(DatabaseSafeAdminMixin, UserAdmin):
     inlines = [ProfileInline]
     list_display = (
         'username',
@@ -28,7 +29,7 @@ class CustomUserAdmin(UserAdmin):
 
 
 @admin.register(Profile)
-class ProfileAdmin(admin.ModelAdmin):
+class ProfileAdmin(DatabaseSafeAdminMixin, admin.ModelAdmin):
     list_display = ('user', 'role', 'contact_number', 'city', 'state')
     list_filter = ('role', 'city', 'state')
     search_fields = (

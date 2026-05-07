@@ -27,6 +27,8 @@ urlpatterns = [
     path('dashboard/', include('dashboard_app.urls')),
 ]
 
-if settings.DEBUG:
+if settings.SERVE_MEDIA_LOCALLY:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

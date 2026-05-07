@@ -2,49 +2,455 @@
 
 {% block title %}Our Fresh Fruits - SOFIA'S FRUIT STORE{% endblock %}
 
+{% block extra_css %}
+<style>
+    .products-page {
+        padding: 3rem 0;
+        overflow-x: clip;
+        scrollbar-width: none;
+    }
+
+    .products-page::-webkit-scrollbar {
+        display: none;
+    }
+
+    .products-heading {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        color: #1a1a1a;
+        line-height: 1.05;
+    }
+
+    .products-search {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .products-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.15rem;
+        border-radius: 1.5rem;
+        background: linear-gradient(180deg, #ffffff 0%, #f5fbf6 100%);
+        box-shadow: 0 12px 28px rgba(19, 44, 33, 0.08);
+    }
+
+    .products-toolbar-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .products-toolbar-label {
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #63816d;
+    }
+
+    .products-sort-form {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .products-sort-select {
+        min-width: 190px;
+
+    }
+
+    .products-search-input {
+        width: 100%;
+        padding: 0.85rem 1rem;
+        border: 1px solid #ddd;
+        border-radius: 999px;
+        background: #fff;
+        color: #333;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .category-filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin: 0;
+    }
+
+    .category-filter-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(45, 122, 90, 0.18);
+        background: #fff;
+        color: var(--primary-green);
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .category-filter-pill:hover {
+        background: #eff8f1;
+        color: var(--primary-green);
+        transform: translateY(-1px);
+    }
+
+    .category-filter-pill.active {
+        background: var(--primary-green);
+        color: #fff;
+        border-color: var(--primary-green);
+        box-shadow: 0 12px 26px rgba(45, 122, 90, 0.18);
+    }
+
+    .product-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .product-card-media {
+        position: relative;
+        overflow: hidden;
+        border-bottom-left-radius: 1.5rem;
+        border-bottom-right-radius: 1.5rem;
+    }
+
+    .product-card-image {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        display: block;
+    }
+
+    .product-card-badge {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        background: rgba(255,255,255,0.92);
+        color: #444;
+        padding: 0.4rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .product-card-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-bottom: 0.6rem;
+        color: #111;
+    }
+
+    .product-card-copy {
+        color: #777;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        min-height: 60px;
+        margin-bottom: 1.4rem;
+        flex-grow: 1;
+    }
+
+    .product-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .product-card-price {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--primary-green);
+    }
+
+    .product-card-add {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        background: var(--primary-green);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .products-page {
+            padding: 1.5rem 0 2rem;
+        }
+
+        .products-page .container-xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .products-heading {
+            font-size: 2.2rem;
+        }
+
+        .products-search {
+            max-width: none;
+        }
+
+        .products-toolbar {
+            padding: 1rem;
+        }
+
+        .products-toolbar,
+        .products-toolbar-group,
+        .products-sort-form {
+            width: 100%;
+        }
+
+        .products-sort-form {
+            justify-content: space-between;
+        }
+
+        .products-sort-select {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .category-filter-bar {
+            gap: 0.6rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .products-search form,
+        .products-search {
+            width: 100%;
+        }
+
+        .product-card-body {
+            padding: 1.15rem;
+        }
+
+        .product-card-copy {
+            min-height: auto;
+            margin-bottom: 1rem;
+        }
+
+        .products-grid {
+            --bs-gutter-x: 0.85rem;
+            --bs-gutter-y: 0.95rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .products-page .container-xl {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .products-heading {
+            font-size: 1.95rem;
+        }
+
+        .products-search {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+
+        .products-toolbar {
+            gap: 0.85rem;
+            padding: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .products-toolbar-group {
+            gap: 0.55rem;
+        }
+
+        .products-sort-form {
+            gap: 0.6rem;
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .category-filter-bar {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 0.35rem;
+            scrollbar-width: none;
+        }
+
+        .category-filter-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-filter-pill {
+            flex: 0 0 auto;
+        }
+
+        .products-search-input,
+        .products-search button,
+        .products-sort-select {
+            width: 100%;
+        }
+
+        .product-card-badge {
+            top: 12px;
+            left: 12px;
+            font-size: 0.72rem;
+            padding: 0.35rem 0.7rem;
+        }
+
+        .products-grid {
+            --bs-gutter-x: 0.75rem;
+            --bs-gutter-y: 0.85rem;
+        }
+
+        .product-card {
+            border-radius: 1.15rem;
+        }
+
+        .product-card-body {
+            padding: 0.95rem;
+        }
+
+        .product-card-title {
+            font-size: 0.96rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .product-card-copy {
+            font-size: 0.84rem;
+            line-height: 1.35;
+            margin-bottom: 0.8rem;
+        }
+
+        .product-card-footer {
+            align-items: stretch;
+            gap: 0.85rem;
+            flex-direction: column;
+        }
+
+        .product-card-price {
+            font-size: 1.05rem;
+        }
+
+        .product-card-add {
+            width: 100%;
+            justify-content: center;
+            padding: 0.7rem 0.9rem;
+            font-size: 0.88rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-xl" style="padding: 3rem 0;">
+<div class="products-page">
+<div class="container-xl">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
         <div>
-            <h1 style="font-size: 2.8rem; font-weight: 800; margin-bottom: 0.25rem; color: #1a1a1a;">Our Fresh Fruits</h1>
+            <h1 class="products-heading">Our Fresh Fruits</h1>
             <p style="color: #666; font-size: 1rem; margin: 0;">{{ products|length }} products available</p>
+            {% if catalog_readonly %}
+            <p style="color: #8a6d1f; font-size: 0.95rem; margin: 0.5rem 0 0;">Showing demo catalog while the live database is unavailable.</p>
+            {% endif %}
         </div>
-        <form method="get" class="d-flex align-items-center gap-2" style="width: 100%; max-width: 420px;">
-            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..."
-                   style="width: 100%; padding: 0.85rem 1rem; border: 1px solid #ddd; border-radius: 999px; background: #fff; color: #333; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);">
+        <form method="get" class="d-flex align-items-center gap-2 products-search">
+            <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search fruits..." class="products-search-input">
+            {% if category_id %}<input type="hidden" name="category" value="{{ category_id }}">{% endif %}
+            {% if sort %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
             <button type="submit" class="btn-primary-custom" style="padding: 0.85rem 1.5rem; border-radius: 999px;">Search</button>
         </form>
     </div>
 
-    <div class="row gx-4 gy-4">
+    <div class="products-toolbar">
+        <div class="products-toolbar-group">
+            <span class="products-toolbar-label">Filter</span>
+            <div class="category-filter-bar">
+                <a href="{% url 'products:product_list' %}?sort={{ sort }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+                   class="category-filter-pill {% if not category_id %}active{% endif %}">
+                    All
+                </a>
+                {% for category in categories %}
+                <a href="{% url 'products:product_list' %}?category={{ category.id }}&sort={{ sort }}{% if query %}&q={{ query|urlencode }}{% endif %}"
+                   class="category-filter-pill {% if category_id == category.id|stringformat:'s' %}active{% endif %}">
+                    {{ category.name }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <form method="get" class="products-sort-form">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            {% if category_id %}<input type="hidden" name="category" value="{{ category_id }}">{% endif %}
+            <label for="sort" class="products-toolbar-label">Sort</label>
+            <select id="sort" name="sort" class="products-sort-select" onchange="this.form.submit()">
+                {% for sort_value, sort_label in sort_options.items %}
+                <option value="{{ sort_value }}"{% if sort == sort_value %} selected{% endif %}>{{ sort_label }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <div class="row gx-4 gy-4 products-grid">
         {% if products %}
             {% for product in products %}
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100" style="border: none; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;"
+            <div class="col-6 col-lg-4 col-xl-3">
+                <div class="card h-100 product-card"
                      onmouseover="this.style.transform='translateY(-7px)'; this.style.boxShadow='0 20px 40px rgba(0,0,0,0.12)';"
                      onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 30px rgba(0,0,0,0.08)';">
-                    <div style="position: relative; overflow: hidden; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem;">
+                    <div class="product-card-media">
                         {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card-image">
                         {% else %}
-                        <img src="https://images.unsplash.com/photo-1599599810694-5ac4dd0485f?w=600&h=600&fit=crop" alt="{{ product.name }}" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+                        <img src="https://images.unsplash.com/photo-1599599810694-5ac4dd0485f?w=600&h=600&fit=crop" alt="{{ product.name }}" class="product-card-image">
                         {% endif %}
-                        <span style="position: absolute; top: 16px; left: 16px; background: rgba(255,255,255,0.92); color: #444; padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;">{{ product.category.name }}</span>
+                        <span class="product-card-badge">{{ product.category.name }}</span>
                     </div>
-                    <div class="card-body" style="padding: 1.5rem;">
-                        <h5 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.6rem; color: #111;">{{ product.name }}</h5>
-                        <p style="color: #777; font-size: 0.95rem; line-height: 1.5; min-height: 60px; margin-bottom: 1.4rem;">{{ product.description|truncatewords:12 }}</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                    <div class="card-body product-card-body">
+                        <h5 class="product-card-title">{{ product.name }}</h5>
+                        <p class="product-card-copy">{{ product.description|truncatewords:12 }}</p>
+                        <div class="product-card-footer">
                             <div>
-                                <div style="font-size: 1.35rem; font-weight: 700; color: var(--primary-green);">&#8369;{{ product.price }} / kg</div>
+                                <div class="product-card-price">
+                                    {% if product.available_cup_sizes %}
+                                    &#8369;{{ product.available_cup_sizes.0.price }}+ / Cup
+                                    {% else %}
+                                    &#8369;{{ product.price }} / {{ product.unit_label }}
+                                    {% endif %}
+                                </div>
                             </div>
                             <form method="post" action="{% url 'products:add_to_cart' product.id %}" style="margin: 0;">
                                 {% csrf_token %}
                                 <input type="hidden" name="quantity" value="1" />
-                                <button type="submit" class="btn-primary-custom" style="padding: 0.75rem 1rem; font-size: 0.95rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.5rem; border: none; background: var(--primary-green); color: white;">
+                                {% if product.available_cup_sizes %}
+                                <input type="hidden" name="selected_size" value="{{ product.available_cup_sizes.0.value }}" />
+                                {% endif %}
+                                {% if catalog_readonly %}
+                                <a href="{% url 'products:product_detail' product.id %}" class="btn-primary-custom product-card-add" style="text-decoration: none;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </a>
+                                {% else %}
+                                <button type="submit" class="btn-primary-custom product-card-add">
                                     <i class="fas fa-cart-plus"></i>
                                     Add
                                 </button>
+                                {% endif %}
                             </form>
                         </div>
                     </div>
@@ -55,11 +461,17 @@
             <div class="col-12">
                 <div style="text-align: center; padding: 3rem; background: var(--light-bg); border-radius: 1.5rem;">
                     <i class="fas fa-ban" style="font-size: 3rem; color: #ddd; margin-bottom: 1rem; display: block;"></i>
+                    {% if catalog_unavailable %}
+                    <h4 style="color: #444; margin-bottom: 0.75rem;">Product catalog unavailable</h4>
+                    <p style="color: #777; margin-bottom: 0;">The catalog is temporarily unavailable while the database finishes connecting. Please try again in a moment.</p>
+                    {% else %}
                     <h4 style="color: #444; margin-bottom: 0.75rem;">No fruits found</h4>
                     <p style="color: #777;">Try selecting a different category or modifying your search.</p>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
     </div>
+</div>
 </div>
 {% endblock %}

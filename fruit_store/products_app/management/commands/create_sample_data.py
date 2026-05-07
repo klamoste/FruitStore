@@ -76,7 +76,7 @@ class Command(BaseCommand):
                 'category': 'Beverages',
                 'price': Decimal('3.99'),
                 'stock_quantity': 200,
-                'unit': 'piece',
+                'unit': 'cup',
             },
             {
                 'name': 'Grapes',
@@ -109,6 +109,17 @@ class Command(BaseCommand):
                     'is_available': True,
                 }
             )
+            if not created and product.name == 'Orange Juice':
+                product.description = prod_data['description']
+                product.category = category
+                product.price = prod_data['price']
+                product.stock_quantity = prod_data['stock_quantity']
+                product.unit = prod_data['unit']
+                product.small_price = None
+                product.medium_price = None
+                product.large_price = None
+                product.is_available = True
+                product.save()
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Created product: {product.name}'))
 

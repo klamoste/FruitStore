@@ -37,7 +37,7 @@
                         <p><strong>Unit:</strong> {{ product.get_unit_display }}</p>
                     </div>
                     
-                    <h2 class="text-success mb-3">₱{{ product.price }}</h2>
+                    <h2 class="text-success mb-3">&#8369;{{ product.price }}</h2>
                     
                     <div class="alert {% if product.stock_quantity > 10 %}alert-success{% elif product.stock_quantity > 0 %}alert-warning{% else %}alert-danger{% endif %}">
                         {% if product.stock_quantity > 10 %}
