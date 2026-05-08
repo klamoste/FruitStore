@@ -143,6 +143,33 @@
                         <p style="margin: 0; color: #55645a; line-height: 1.6;">{{ order.customer_note|linebreaksbr }}</p>
                     </div>
                     {% endif %}
+
+                    <div style="margin-bottom: 2rem; padding: 1rem 1.1rem; border-radius: 0.75rem; background: #fffdf6; border: 1px solid #efe3b2;">
+                        <h6 style="font-weight: 700; margin-bottom: 0.9rem; color: var(--primary-green);">Payment and Delivery Details</h6>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Payment Method</span>
+                            <span style="font-weight: 600;">{{ order.get_payment_method_display }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Delivery Date</span>
+                            <span style="font-weight: 600;">{{ order.delivery_date|date:"M d, Y"|default:"Not set" }}</span>
+                        </div>
+                        <div class="order-summary-row" style="margin-bottom: 0;">
+                            <span style="color: #666;">Delivery Window</span>
+                            <span style="font-weight: 600;">{{ order.get_delivery_window_display|default:"Not set" }}</span>
+                        </div>
+                        {% if order.payment_method == 'GCASH' %}
+                        <hr style="margin: 1rem 0;">
+                        <div class="order-summary-row">
+                            <span style="color: #666;">GCash Sender</span>
+                            <span style="font-weight: 600;">{{ order.gcash_sender_name|default:"Not provided" }}</span>
+                        </div>
+                        <div class="order-summary-row" style="margin-bottom: 0;">
+                            <span style="color: #666;">Reference Number</span>
+                            <span style="font-weight: 600;">{{ order.gcash_reference_number|default:"Not provided" }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
                     
                     <!-- Order Items -->
                     <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">Order Items</h4>
@@ -183,6 +210,18 @@
                         <div class="order-summary-row">
                             <span style="color: #666;">Order ID</span>
                             <span style="font-weight: 600;">{{ order.order_code }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Payment</span>
+                            <span style="font-weight: 600;">{{ order.get_payment_method_display }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Delivery</span>
+                            <span style="font-weight: 600;">{{ order.delivery_date|date:"M d, Y"|default:"Not set" }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Window</span>
+                            <span style="font-weight: 600;">{{ order.get_delivery_window_display|default:"Not set" }}</span>
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Subtotal</span>

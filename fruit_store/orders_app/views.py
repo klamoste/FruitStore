@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.db import DatabaseError, transaction
 from .models import Order, OrderItem
@@ -223,15 +224,24 @@ def checkout(request):
         form = PaymentForm(request.POST)
         if form.is_valid():
             payment_method = form.cleaned_data['payment_method']
+            delivery_date = form.cleaned_data['delivery_date']
+            delivery_window = form.cleaned_data['delivery_window']
+            gcash_sender_name = form.cleaned_data['gcash_sender_name']
+            gcash_reference_number = form.cleaned_data['gcash_reference_number']
             customer_note = form.cleaned_data['customer_note']
             
             # Create order
             try:
                 order = Order.objects.create(
                     user=request.user,
+                    payment_method=payment_method,
+                    delivery_date=delivery_date,
+                    delivery_window=delivery_window,
+                    gcash_sender_name=gcash_sender_name,
+                    gcash_reference_number=gcash_reference_number,
                     customer_note=customer_note,
                     total_price=final_total,
-                    status='paid' if payment_method == 'PAID' else 'pending'
+                    status='pending'
                 )
                 
                 for item in cart_items:
@@ -277,6 +287,7 @@ def checkout(request):
         'final_total': final_total,
         'cart_items': cart_items,
         'item_count': sum(item['quantity'] for item in cart_items),
+        'gcash_number': getattr(settings, 'STORE_GCASH_NUMBER', '').strip(),
     }
     return render(request, 'orders/checkout.html', context)
 

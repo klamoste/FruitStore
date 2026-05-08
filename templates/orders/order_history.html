@@ -73,6 +73,11 @@
                             <div>
                                 <p style="color: #999; margin: 0; font-size: 0.9rem;">Items: {{ order.orderitem_set.count }}</p>
                                 <p style="color: #999; margin: 0; font-size: 0.9rem;">Status: {{ order.get_status_display }}</p>
+                                <p style="color: #999; margin: 0; font-size: 0.9rem;">Payment: {{ order.get_payment_method_display }}</p>
+                                <p style="color: #999; margin: 0; font-size: 0.9rem;">Delivery: {{ order.delivery_date|date:"M d, Y"|default:"Not set" }}{% if order.delivery_window %} • {{ order.get_delivery_window_display }}{% endif %}</p>
+                                {% if order.payment_method == 'GCASH' and order.gcash_reference_number %}
+                                <p style="color: #999; margin: 0.35rem 0 0; font-size: 0.85rem;">GCash Ref: {{ order.gcash_reference_number }}</p>
+                                {% endif %}
                                 {% if order.customer_note %}
                                 <p style="color: #999; margin: 0.35rem 0 0; font-size: 0.85rem;">Note: {{ order.customer_note|truncatechars:55 }}</p>
                                 {% endif %}

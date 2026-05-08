@@ -1,4 +1,6 @@
 from django import forms
+from django.utils import timezone
+
 from .models import Order
 
 
@@ -9,14 +11,41 @@ class CheckoutForm(forms.ModelForm):
 
 
 class PaymentForm(forms.Form):
-    PAYMENT_CHOICES = [
-        ('COD', 'Cash on Delivery'),
-        ('GCASH', 'GCash'),
-    ]
-    
     payment_method = forms.ChoiceField(
-        choices=PAYMENT_CHOICES,
+        choices=Order.PAYMENT_METHOD_CHOICES,
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
+    )
+    delivery_date = forms.DateField(
+        widget=forms.DateInput(
+            attrs={
+                'class': 'form-control',
+                'type': 'date',
+            }
+        )
+    )
+    delivery_window = forms.ChoiceField(
+        choices=Order.DELIVERY_WINDOW_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+    )
+    gcash_sender_name = forms.CharField(
+        required=False,
+        max_length=120,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Name used in the GCash payment',
+            }
+        ),
+    )
+    gcash_reference_number = forms.CharField(
+        required=False,
+        max_length=60,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Reference number from your GCash receipt',
+            }
+        ),
     )
     customer_note = forms.CharField(
         required=False,
@@ -30,3 +59,25 @@ class PaymentForm(forms.Form):
         ),
         label='Order Note',
     )
+
+    def clean_delivery_date(self):
+        delivery_date = self.cleaned_data['delivery_date']
+        if delivery_date < timezone.localdate():
+            raise forms.ValidationError('Please choose a delivery date that is today or later.')
+        return delivery_date
+
+    def clean(self):
+        cleaned_data = super().clean()
+        payment_method = cleaned_data.get('payment_method')
+        sender_name = (cleaned_data.get('gcash_sender_name') or '').strip()
+        reference_number = (cleaned_data.get('gcash_reference_number') or '').strip()
+
+        if payment_method == 'GCASH':
+            if not sender_name:
+                self.add_error('gcash_sender_name', 'Enter the sender name used for the GCash payment.')
+            if not reference_number:
+                self.add_error('gcash_reference_number', 'Enter the GCash reference number.')
+
+        cleaned_data['gcash_sender_name'] = sender_name
+        cleaned_data['gcash_reference_number'] = reference_number
+        return cleaned_data

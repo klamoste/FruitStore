@@ -16,10 +16,32 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     ]
+    PAYMENT_METHOD_CHOICES = [
+        ('COD', 'Cash on Delivery'),
+        ('GCASH', 'GCash'),
+    ]
+    DELIVERY_WINDOW_CHOICES = [
+        ('morning', 'Morning'),
+        ('afternoon', 'Afternoon'),
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_code = models.CharField(max_length=20, unique=True, blank=True)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_method = models.CharField(
+        max_length=10,
+        choices=PAYMENT_METHOD_CHOICES,
+        default='COD',
+    )
+    delivery_date = models.DateField(null=True, blank=True)
+    delivery_window = models.CharField(
+        max_length=20,
+        choices=DELIVERY_WINDOW_CHOICES,
+        blank=True,
+        default='',
+    )
+    gcash_sender_name = models.CharField(max_length=120, blank=True)
+    gcash_reference_number = models.CharField(max_length=60, blank=True)
     customer_note = models.TextField(blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)

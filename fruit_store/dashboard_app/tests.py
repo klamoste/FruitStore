@@ -50,4 +50,5 @@ class DashboardViewTests(TestCase):
             response = self.client.get(reverse('dashboard:dashboard'), follow=True, secure=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Dashboard data is temporarily unavailable')
+        self.assertContains(response, 'Total Orders')
+        self.assertContains(response, 'No orders yet')
