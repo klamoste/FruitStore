@@ -1,4 +1,3 @@
-import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,10 +6,8 @@ from django.db import DatabaseError, transaction
 from .models import Order, OrderItem
 from .forms import CheckoutForm, PaymentForm
 from products_app.models import Product, InventoryLog
-from accounts_app.models import Profile
 from decimal import Decimal
-
-logger = logging.getLogger(__name__)
+from accounts_app.models import Profile
 
 SHIPPING_FEE = Decimal('50.00')
 GCASH_ACCOUNT_NAME = "Sofia's Fruit Store"
@@ -271,10 +268,10 @@ def checkout(request):
                         change=-quantity,
                         reason='sale'
                     )
-            except DatabaseError:
-                logger.exception(
-                    'Order placement failed for user %s during checkout.',
-                    request.user.pk,
+            except DatabaseError as exc:
+                print(
+                    f'CHECKOUT_DATABASE_ERROR user={request.user.pk} '
+                    f'type={type(exc).__name__} message={exc}'
                 )
                 messages.error(
                     request,
