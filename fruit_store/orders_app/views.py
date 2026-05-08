@@ -269,13 +269,13 @@ def checkout(request):
                         reason='sale'
                     )
             except DatabaseError as exc:
-                print(
-                    f'CHECKOUT_DATABASE_ERROR user={request.user.pk} '
-                    f'type={type(exc).__name__} message={exc}'
-                )
                 messages.error(
                     request,
                     'We could not place your order because the database is temporarily unavailable.'
+                )
+                messages.error(
+                    request,
+                    f'Checkout database error: {type(exc).__name__}: {exc}'
                 )
             else:
                 request.session['cart'] = {}
