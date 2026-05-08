@@ -381,6 +381,7 @@
                                 <div class="checkout-field">
                                     <label for="{{ form.delivery_date.id_for_label }}">Delivery Date</label>
                                     {{ form.delivery_date }}
+                                    <div class="checkout-field-help" id="deliveryDateDay" aria-live="polite"></div>
                                     {% if form.delivery_date.errors %}
                                     <div class="field-errors">{{ form.delivery_date.errors|join:", " }}</div>
                                     {% endif %}
@@ -478,10 +479,34 @@
     (function () {
         const gcashFields = document.getElementById('gcashFields');
         const paymentInputs = document.querySelectorAll('input[name="payment_method"]');
+        const deliveryDateInput = document.getElementById('{{ form.delivery_date.id_for_label }}');
+        const deliveryDateDay = document.getElementById('deliveryDateDay');
 
         function toggleGcashFields() {
             const selected = document.querySelector('input[name="payment_method"]:checked');
             gcashFields.style.display = selected && selected.value === 'GCASH' ? '' : 'none';
+        }
+
+        function updateDeliveryDay() {
+            if (!deliveryDateInput || !deliveryDateDay) {
+                return;
+            }
+
+            if (!deliveryDateInput.value) {
+                deliveryDateDay.textContent = '';
+                return;
+            }
+
+            const date = new Date(deliveryDateInput.value + 'T00:00:00');
+
+            if (Number.isNaN(date.getTime())) {
+                deliveryDateDay.textContent = '';
+                return;
+            }
+
+            deliveryDateDay.textContent = 'Selected day: ' + date.toLocaleDateString('en-US', {
+                weekday: 'long',
+            });
         }
 
         paymentInputs.forEach((input) => {
@@ -489,6 +514,12 @@
         });
 
         toggleGcashFields();
+        updateDeliveryDay();
+
+        if (deliveryDateInput) {
+            deliveryDateInput.addEventListener('input', updateDeliveryDay);
+            deliveryDateInput.addEventListener('change', updateDeliveryDay);
+        }
     }());
 </script>
 {% endblock %}
