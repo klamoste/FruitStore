@@ -6,12 +6,10 @@ from django.db import DatabaseError, transaction
 from .models import Order, OrderItem
 from .forms import CheckoutForm, PaymentForm
 from products_app.models import Product, InventoryLog
-from decimal import Decimal
 from accounts_app.models import Profile
+from decimal import Decimal
 
 SHIPPING_FEE = Decimal('50.00')
-GCASH_ACCOUNT_NAME = "Sofia's Fruit Store"
-GCASH_NUMBER = '09213382336'
 
 
 def get_cart_labels(product, item):
@@ -225,24 +223,15 @@ def checkout(request):
         form = PaymentForm(request.POST)
         if form.is_valid():
             payment_method = form.cleaned_data['payment_method']
-            gcash_sender_name = form.cleaned_data['gcash_sender_name']
-            gcash_reference = form.cleaned_data['gcash_reference']
-            requested_delivery_date = form.cleaned_data['requested_delivery_date']
-            requested_delivery_time = form.cleaned_data['requested_delivery_time']
             customer_note = form.cleaned_data['customer_note']
             
             # Create order
             try:
                 order = Order.objects.create(
                     user=request.user,
-                    payment_method=payment_method,
-                    gcash_sender_name=gcash_sender_name,
-                    gcash_reference=gcash_reference,
                     customer_note=customer_note,
-                    requested_delivery_date=requested_delivery_date,
-                    requested_delivery_time=requested_delivery_time,
                     total_price=final_total,
-                    status='paid' if payment_method == Order.PAYMENT_METHOD_GCASH else 'pending'
+                    status='paid' if payment_method == 'PAID' else 'pending'
                 )
                 
                 for item in cart_items:
@@ -268,25 +257,16 @@ def checkout(request):
                         change=-quantity,
                         reason='sale'
                     )
-            except DatabaseError as exc:
+            except DatabaseError:
                 messages.error(
                     request,
                     'We could not place your order because the database is temporarily unavailable.'
-                )
-                messages.error(
-                    request,
-                    f'Checkout database error: {type(exc).__name__}: {exc}'
                 )
             else:
                 request.session['cart'] = {}
                 request.session.modified = True
                 
                 return redirect('orders:order_detail', order_id=order.id)
-        else:
-            messages.error(
-                request,
-                f'Checkout form errors: {form.errors.as_json()}'
-            )
     else:
         form = PaymentForm()
     
@@ -297,8 +277,6 @@ def checkout(request):
         'final_total': final_total,
         'cart_items': cart_items,
         'item_count': sum(item['quantity'] for item in cart_items),
-        'gcash_account_name': GCASH_ACCOUNT_NAME,
-        'gcash_number': GCASH_NUMBER,
     }
     return render(request, 'orders/checkout.html', context)
 

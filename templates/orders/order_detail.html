@@ -120,9 +120,6 @@
                         <div>
                             <h2 style="font-weight: 700; margin: 0; color: #1a1a1a;">{{ order.order_code }}</h2>
                             <p style="color: #999; margin: 0.5rem 0 0;">Placed {{ order.created_at|date:"M d, Y P" }}</p>
-                            <p style="color: var(--primary-green); margin: 0.45rem 0 0; font-weight: 600;">
-                                Requested delivery: {{ order.requested_delivery_date|date:"M d, Y" }} ({{ order.requested_delivery_day }}) in the {{ order.requested_delivery_period_display|lower }}
-                            </p>
                         </div>
                         <div class="order-detail-actions">
                             <span style="background: var(--light-green); color: white; padding: 0.6rem 1.2rem; border-radius: 20px; font-size: 0.95rem; font-weight: 600;">
@@ -146,15 +143,6 @@
                         <p style="margin: 0; color: #55645a; line-height: 1.6;">{{ order.customer_note|linebreaksbr }}</p>
                     </div>
                     {% endif %}
-
-                    <div style="margin-bottom: 2rem; padding: 1rem 1.1rem; border-radius: 0.75rem; background: #f8fbf8; border: 1px solid #e1ebe2;">
-                        <h6 style="font-weight: 700; margin-bottom: 0.5rem; color: var(--primary-green);">Payment Details</h6>
-                        <p style="margin: 0; color: #55645a; line-height: 1.6;">Method: {{ order.get_payment_method_display }}</p>
-                        {% if order.payment_method == 'GCASH' %}
-                        <p style="margin: 0.35rem 0 0; color: #55645a; line-height: 1.6;">Sender: {{ order.gcash_sender_name }}</p>
-                        <p style="margin: 0.35rem 0 0; color: #55645a; line-height: 1.6;">Reference: {{ order.gcash_reference }}</p>
-                        {% endif %}
-                    </div>
                     
                     <!-- Order Items -->
                     <h4 style="font-weight: 700; margin-bottom: 1.5rem; color: var(--primary-green);">Order Items</h4>
@@ -197,30 +185,8 @@
                             <span style="font-weight: 600;">{{ order.order_code }}</span>
                         </div>
                         <div class="order-summary-row">
-                            <span style="color: #666;">Payment Method</span>
-                            <span style="font-weight: 600;">{{ order.get_payment_method_display }}</span>
-                        </div>
-                        {% if order.payment_method == 'GCASH' %}
-                        <div class="order-summary-row">
-                            <span style="color: #666;">GCash Reference</span>
-                            <span style="font-weight: 600;">{{ order.gcash_reference }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="order-summary-row">
                             <span style="color: #666;">Subtotal</span>
                             <span style="font-weight: 600;">&#8369;{{ subtotal_price }}</span>
-                        </div>
-                        <div class="order-summary-row">
-                            <span style="color: #666;">Delivery Date</span>
-                            <span style="font-weight: 600;">{{ order.requested_delivery_date|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="order-summary-row">
-                            <span style="color: #666;">Delivery Day</span>
-                            <span style="font-weight: 600;">{{ order.requested_delivery_day }}</span>
-                        </div>
-                        <div class="order-summary-row">
-                            <span style="color: #666;">Delivery Window</span>
-                            <span style="font-weight: 600;">{{ order.requested_delivery_period_display }}</span>
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Shipping</span>

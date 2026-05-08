@@ -13,17 +13,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
-try:
-    import dj_database_url
-except ModuleNotFoundError:
-    dj_database_url = None
-
-try:
-    import whitenoise  # noqa: F401
-except ModuleNotFoundError:
-    WHITENOISE_AVAILABLE = False
-else:
-    WHITENOISE_AVAILABLE = True
+import dj_database_url
 
 
 def env_flag(name, default=False):
@@ -101,6 +91,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -108,9 +99,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-if WHITENOISE_AVAILABLE:
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'fruit_store.urls'
 
@@ -144,8 +132,8 @@ DATABASES = {
 }
 
 database_url = get_database_url()
-DATABASE_URL_CONFIGURED = bool(database_url and dj_database_url)
-if database_url and dj_database_url:
+DATABASE_URL_CONFIGURED = bool(database_url)
+if database_url:
     DATABASES['default'] = dj_database_url.parse(
         database_url,
         conn_max_age=600,
@@ -197,15 +185,10 @@ STORAGES = {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
     },
     'staticfiles': {
-        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-    },
-}
-
-if WHITENOISE_AVAILABLE:
-    STORAGES['staticfiles'] = {
         # Avoid manifest build failures on serverless deploys while still serving compressed assets.
         'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
-    }
+    },
+}
 
 # Media files (Uploads)
 MEDIA_URL = '/media/'
@@ -231,13 +214,9 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
             'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
         },
         'staticfiles': {
-            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+            'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
         },
     }
-    if WHITENOISE_AVAILABLE:
-        STORAGES['staticfiles'] = {
-            'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
-        }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Authentication

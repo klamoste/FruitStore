@@ -73,31 +73,9 @@
         resize: vertical;
         padding: 1rem 1.1rem;
     }
-    .checkout-field input,
-    .checkout-field select {
-        border-radius: 1rem;
-        border: 1px solid #d6e4d9;
-        box-shadow: none;
-        padding: 0.95rem 1.1rem;
-        width: 100%;
-        background: #fff;
-    }
-    .checkout-field input:focus,
-    .checkout-field select:focus,
     .checkout-field textarea:focus {
         border-color: rgba(45, 122, 90, 0.45);
         box-shadow: 0 0 0 0.18rem rgba(45, 122, 90, 0.12);
-    }
-    .checkout-schedule-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-    }
-    .checkout-schedule-day {
-        margin-top: 0.75rem;
-        color: #1f5540;
-        font-size: 0.92rem;
-        font-weight: 600;
     }
     .checkout-field-help {
         color: #718175;
@@ -141,52 +119,6 @@
         color: #5f6e60;
         line-height: 1.6;
         font-size: 0.95rem;
-    }
-    .gcash-panel {
-        margin: 1.25rem 0 0;
-        padding: 1.25rem;
-        border-radius: 1rem;
-        background: linear-gradient(135deg, #f4fbf7 0%, #ffffff 100%);
-        border: 1px solid #d7eadc;
-    }
-    .gcash-panel.is-hidden {
-        display: none;
-    }
-    .gcash-panel-title {
-        margin: 0 0 0.45rem;
-        color: #1f5540;
-        font-weight: 800;
-        font-size: 1rem;
-    }
-    .gcash-panel-copy {
-        margin: 0;
-        color: #567060;
-        line-height: 1.6;
-    }
-    .gcash-panel-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    .gcash-panel-stat {
-        background: #fff;
-        border-radius: 0.9rem;
-        border: 1px solid #e1eee5;
-        padding: 0.95rem 1rem;
-    }
-    .gcash-panel-label {
-        color: #718175;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-bottom: 0.3rem;
-    }
-    .gcash-panel-value {
-        color: #1f5540;
-        font-size: 1.05rem;
-        font-weight: 700;
-        word-break: break-word;
     }
     .place-order-btn {
         padding: 1.1rem 1.4rem;
@@ -294,10 +226,6 @@
             align-items: flex-start;
             padding: 1rem;
         }
-        .gcash-panel-grid,
-        .checkout-schedule-grid {
-            grid-template-columns: 1fr;
-        }
         .summary-item {
             flex-direction: column;
             align-items: stretch;
@@ -348,70 +276,12 @@
                                         {% if "COD" in radio.data.value %}
                                             Pay cash when your fruits are delivered to your door.
                                         {% else %}
-                                            Pay with GCash for a faster cashless checkout experience.
+                                            Use GCash to pay quickly and securely.
                                         {% endif %}
                                     </div>
                                 </div>
                             </label>
                             {% endfor %}
-                        </div>
-                        {% if form.payment_method.errors %}
-                        <div class="text-danger mb-3">{{ form.payment_method.errors|join:", " }}</div>
-                        {% endif %}
-
-                        <div class="gcash-panel is-hidden" id="gcashPanel">
-                            <p class="gcash-panel-title">Pay with GCash before placing the order</p>
-                            <p class="gcash-panel-copy">Send the full amount to the GCash account below, then enter the sender name and reference number so the order is recorded as paid.</p>
-                            <div class="gcash-panel-grid">
-                                <div class="gcash-panel-stat">
-                                    <div class="gcash-panel-label">GCash Name</div>
-                                    <div class="gcash-panel-value">{{ gcash_account_name }}</div>
-                                </div>
-                                <div class="gcash-panel-stat">
-                                    <div class="gcash-panel-label">GCash Number</div>
-                                    <div class="gcash-panel-value">{{ gcash_number }}</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="checkout-schedule-grid" id="gcashFields">
-                            <div class="checkout-field">
-                                <label for="{{ form.gcash_sender_name.id_for_label }}">{{ form.gcash_sender_name.label }}</label>
-                                {{ form.gcash_sender_name }}
-                                <div class="checkout-field-help">Use the exact GCash account name that sent the payment.</div>
-                                {% if form.gcash_sender_name.errors %}
-                                <div class="text-danger mt-2">{{ form.gcash_sender_name.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="checkout-field">
-                                <label for="{{ form.gcash_reference.id_for_label }}">{{ form.gcash_reference.label }}</label>
-                                {{ form.gcash_reference }}
-                                <div class="checkout-field-help">Paste the transaction reference from your GCash receipt.</div>
-                                {% if form.gcash_reference.errors %}
-                                <div class="text-danger mt-2">{{ form.gcash_reference.errors|join:", " }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="checkout-field">
-                            <label>Requested Delivery Schedule</label>
-                            <div class="checkout-schedule-grid">
-                                <div>
-                                    {{ form.requested_delivery_date }}
-                                    <div class="checkout-field-help">Choose the delivery date you want for this order.</div>
-                                    {% if form.requested_delivery_date.errors %}
-                                    <div class="text-danger mt-2">{{ form.requested_delivery_date.errors|join:", " }}</div>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    {{ form.requested_delivery_time }}
-                                    <div class="checkout-field-help">Choose whether you want the delivery in the morning or afternoon.</div>
-                                    {% if form.requested_delivery_time.errors %}
-                                    <div class="text-danger mt-2">{{ form.requested_delivery_time.errors|join:", " }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="checkout-schedule-day" id="deliveryDayPreview">Day: Select a date to preview the delivery day.</div>
                         </div>
 
                         <div class="checkout-field">
@@ -473,65 +343,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    (function () {
-        const dateInput = document.getElementById('{{ form.requested_delivery_date.id_for_label }}');
-        const preview = document.getElementById('deliveryDayPreview');
-        const paymentInputs = document.querySelectorAll('input[name="{{ form.payment_method.html_name }}"]');
-        const gcashPanel = document.getElementById('gcashPanel');
-        const gcashFields = document.getElementById('gcashFields');
-        const gcashSenderName = document.getElementById('{{ form.gcash_sender_name.id_for_label }}');
-        const gcashReference = document.getElementById('{{ form.gcash_reference.id_for_label }}');
-
-        function updateDayPreview() {
-            if (!dateInput || !preview) {
-                return;
-            }
-
-            if (!dateInput.value) {
-                preview.textContent = 'Day: Select a date to preview the delivery day.';
-                return;
-            }
-
-            const selectedDate = new Date(dateInput.value + 'T00:00:00');
-            if (Number.isNaN(selectedDate.getTime())) {
-                preview.textContent = 'Day: Please choose a valid delivery date.';
-                return;
-            }
-
-            const weekday = selectedDate.toLocaleDateString(undefined, { weekday: 'long' });
-            preview.textContent = 'Day: ' + weekday;
-        }
-
-        function updatePaymentFields() {
-            const selectedPayment = document.querySelector('input[name="{{ form.payment_method.html_name }}"]:checked');
-            const isGCash = selectedPayment && selectedPayment.value === 'GCASH';
-
-            if (gcashPanel) {
-                gcashPanel.classList.toggle('is-hidden', !isGCash);
-            }
-            if (gcashFields) {
-                gcashFields.style.display = isGCash ? 'grid' : 'none';
-            }
-            if (gcashSenderName) {
-                gcashSenderName.required = !!isGCash;
-            }
-            if (gcashReference) {
-                gcashReference.required = !!isGCash;
-            }
-        }
-
-        if (dateInput) {
-            dateInput.addEventListener('input', updateDayPreview);
-            updateDayPreview();
-        }
-        paymentInputs.forEach(function (input) {
-            input.addEventListener('change', updatePaymentFields);
-        });
-        updatePaymentFields();
-    }());
-</script>
 {% endblock %}
