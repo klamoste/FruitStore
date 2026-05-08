@@ -48,10 +48,6 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
-        if self.unit == 'cup':
-            self.size = ''
-            return
-
         self.size = ''
         self.small_price = None
         self.medium_price = None
@@ -65,35 +61,7 @@ class Product(models.Model):
 
     @property
     def available_cup_sizes(self):
-        if self.unit != 'cup':
-            return []
-
-        options = []
-        size_definitions = [
-            ('small', self.small_price, 'Small Cup'),
-            ('medium', self.medium_price, 'Medium Cup'),
-            ('large', self.large_price, 'Large Cup'),
-        ]
-
-        for value, price, label in size_definitions:
-            if price is None:
-                continue
-            options.append({
-                'value': value,
-                'label': label,
-                'price': price,
-                'unit_label': 'Cup',
-            })
-
-        if options:
-            return options
-
-        return [{
-            'value': 'regular',
-            'label': 'Regular Cup',
-            'price': self.price,
-            'unit_label': 'Cup',
-        }]
+        return []
 
     def __str__(self):
         return self.name
