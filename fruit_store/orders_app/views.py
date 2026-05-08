@@ -282,6 +282,11 @@ def checkout(request):
                 request.session.modified = True
                 
                 return redirect('orders:order_detail', order_id=order.id)
+        else:
+            messages.error(
+                request,
+                f'Checkout form errors: {form.errors.as_json()}'
+            )
     else:
         form = PaymentForm()
     
