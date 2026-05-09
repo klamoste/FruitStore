@@ -12,7 +12,7 @@ from orders_app.models import Order, OrderItem
 from products_app.models import Category, Product
 
 
-@override_settings(STORE_GCASH_NUMBER='09171234567')
+@override_settings(STORE_GCASH_NAME='Sofia Fruit Store', STORE_GCASH_NUMBER='09171234567')
 class CheckoutFlowTests(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -74,6 +74,49 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(response, 'Enter the GCash reference number.')
         self.assertEqual(Order.objects.count(), 0)
 
+    def test_checkout_rejects_non_letter_gcash_sender_name(self):
+        delivery_date = timezone.localdate() + timedelta(days=1)
+
+        response = self.client.post(
+            reverse('orders:checkout'),
+            data={
+                'payment_method': 'GCASH',
+                'delivery_date': delivery_date.isoformat(),
+                'delivery_window': 'morning',
+                'gcash_sender_name': 'Sofia123',
+                'gcash_reference_number': '1234567890',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'GCash sender name must contain letters and spaces only.')
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_rejects_non_numeric_gcash_reference_number(self):
+        delivery_date = timezone.localdate() + timedelta(days=1)
+
+        response = self.client.post(
+            reverse('orders:checkout'),
+            data={
+                'payment_method': 'GCASH',
+                'delivery_date': delivery_date.isoformat(),
+                'delivery_window': 'morning',
+                'gcash_sender_name': 'Sofia Buyer',
+                'gcash_reference_number': 'GC12345',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'GCash reference number must contain numbers only.')
+        self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_shows_configured_gcash_account_details(self):
+        response = self.client.get(reverse('orders:checkout'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Sofia Fruit Store')
+        self.assertContains(response, '09171234567')
+
     def test_checkout_persists_delivery_and_gcash_fields(self):
         delivery_date = timezone.localdate() + timedelta(days=2)
 
@@ -84,7 +127,7 @@ class CheckoutFlowTests(TestCase):
                 'delivery_date': delivery_date.isoformat(),
                 'delivery_window': 'afternoon',
                 'gcash_sender_name': 'Sofia Buyer',
-                'gcash_reference_number': 'GC123456789',
+                'gcash_reference_number': '123456789',
                 'customer_note': 'Please call before delivery.',
             },
         )
@@ -96,7 +139,7 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(order.delivery_date, delivery_date)
         self.assertEqual(order.delivery_window, 'afternoon')
         self.assertEqual(order.gcash_sender_name, 'Sofia Buyer')
-        self.assertEqual(order.gcash_reference_number, 'GC123456789')
+        self.assertEqual(order.gcash_reference_number, '123456789')
         self.assertEqual(order.status, 'pending')
         self.assertEqual(order.total_price, Decimal('250.00'))
         self.assertEqual(OrderItem.objects.filter(order=order).count(), 1)

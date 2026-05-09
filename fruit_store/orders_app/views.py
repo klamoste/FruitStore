@@ -287,6 +287,7 @@ def checkout(request):
         'final_total': final_total,
         'cart_items': cart_items,
         'item_count': sum(item['quantity'] for item in cart_items),
+        'gcash_name': getattr(settings, 'STORE_GCASH_NAME', '').strip(),
         'gcash_number': getattr(settings, 'STORE_GCASH_NUMBER', '').strip(),
     }
     return render(request, 'orders/checkout.html', context)

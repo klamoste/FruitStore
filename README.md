@@ -18,6 +18,13 @@ Open `http://127.0.0.1:8000/`.
 
 The project also reads local settings from `fruit_store/.env` automatically. A local `.env` file is already ignored by git.
 
+To show customers where to send GCash payments during checkout, add these optional values to `fruit_store/.env`:
+
+```env
+STORE_GCASH_NAME=Your Admin or Store GCash Name
+STORE_GCASH_NUMBER=09XXXXXXXXX
+```
+
 ## Demo accounts
 
 - Admin: `admin` / `admin123`

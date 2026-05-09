@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import RegexValidator
 from django.utils import timezone
 
 from .models import Order
@@ -13,6 +14,7 @@ class CheckoutForm(forms.ModelForm):
 class PaymentForm(forms.Form):
     payment_method = forms.ChoiceField(
         choices=Order.PAYMENT_METHOD_CHOICES,
+        initial='COD',
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
     delivery_date = forms.DateField(
@@ -30,20 +32,36 @@ class PaymentForm(forms.Form):
     gcash_sender_name = forms.CharField(
         required=False,
         max_length=120,
+        validators=[
+            RegexValidator(
+                regex=r'^[A-Za-z ]+$',
+                message='GCash sender name must contain letters and spaces only.',
+            )
+        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Name used in the GCash payment',
+                'inputmode': 'text',
+                'pattern': '[A-Za-z ]+',
             }
         ),
     )
     gcash_reference_number = forms.CharField(
         required=False,
         max_length=60,
+        validators=[
+            RegexValidator(
+                regex=r'^\d+$',
+                message='GCash reference number must contain numbers only.',
+            )
+        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Reference number from your GCash receipt',
+                'inputmode': 'numeric',
+                'pattern': '\d+',
             }
         ),
     )
@@ -59,6 +77,10 @@ class PaymentForm(forms.Form):
         ),
         label='Order Note',
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['delivery_date'].widget.attrs['min'] = timezone.localdate().isoformat()
 
     def clean_delivery_date(self):
         delivery_date = self.cleaned_data['delivery_date']

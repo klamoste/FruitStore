@@ -225,6 +225,7 @@ LOGIN_REDIRECT_URL = 'products:home'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
+STORE_GCASH_NAME = os.environ.get('STORE_GCASH_NAME', '').strip()
 STORE_GCASH_NUMBER = os.environ.get('STORE_GCASH_NUMBER', '').strip()
 
 # Default primary key field type
