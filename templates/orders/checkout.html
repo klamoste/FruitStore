@@ -566,14 +566,14 @@
             if (!gcashSenderName) {
                 return;
             }
-            gcashSenderName.value = gcashSenderName.value.replace(/[^A-Za-z ]+/g, '');
+            gcashSenderName.value = gcashSenderName.value.replace(/[^A-Za-z .'-]+/g, '');
         }
 
         function sanitizeReferenceNumber() {
             if (!gcashReferenceNumber) {
                 return;
             }
-            gcashReferenceNumber.value = gcashReferenceNumber.value.replace(/\D+/g, '');
+            gcashReferenceNumber.value = gcashReferenceNumber.value.replace(/[^A-Za-z0-9-]+/g, '').toUpperCase();
         }
 
         function updateDeliveryDay() {

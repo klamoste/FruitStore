@@ -89,10 +89,10 @@ class CheckoutFlowTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'GCash sender name must contain letters and spaces only.')
+        self.assertContains(response, 'GCash sender name can use letters, spaces, periods, apostrophes, and hyphens.')
         self.assertEqual(Order.objects.count(), 0)
 
-    def test_checkout_rejects_non_numeric_gcash_reference_number(self):
+    def test_checkout_rejects_invalid_gcash_reference_number(self):
         delivery_date = timezone.localdate() + timedelta(days=1)
 
         response = self.client.post(
@@ -102,13 +102,33 @@ class CheckoutFlowTests(TestCase):
                 'delivery_date': delivery_date.isoformat(),
                 'delivery_window': 'morning',
                 'gcash_sender_name': 'Sofia Buyer',
-                'gcash_reference_number': 'GC12345',
+                'gcash_reference_number': 'GC/12345',
             },
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'GCash reference number must contain numbers only.')
+        self.assertContains(response, 'GCash reference number can use letters, numbers, and hyphens only.')
         self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_accepts_common_gcash_sender_name_and_reference_formats(self):
+        delivery_date = timezone.localdate() + timedelta(days=1)
+
+        response = self.client.post(
+            reverse('orders:checkout'),
+            data={
+                'payment_method': 'GCASH',
+                'delivery_date': delivery_date.isoformat(),
+                'delivery_window': 'morning',
+                'gcash_sender_name': "Sofia B. Buyer-Santos",
+                'gcash_reference_number': 'GC-12345-AB',
+            },
+        )
+
+        order = Order.objects.get()
+
+        self.assertRedirects(response, reverse('orders:order_detail', args=[order.id]))
+        self.assertEqual(order.gcash_sender_name, "Sofia B. Buyer-Santos")
+        self.assertEqual(order.gcash_reference_number, 'GC-12345-AB')
 
     def test_checkout_shows_configured_gcash_account_details(self):
         response = self.client.get(reverse('orders:checkout'))

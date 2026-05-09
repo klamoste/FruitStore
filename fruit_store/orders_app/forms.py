@@ -34,8 +34,8 @@ class PaymentForm(forms.Form):
         max_length=120,
         validators=[
             RegexValidator(
-                regex=r'^[A-Za-z ]+$',
-                message='GCash sender name must contain letters and spaces only.',
+                regex=r"^[A-Za-z][A-Za-z .'-]*$",
+                message="GCash sender name can use letters, spaces, periods, apostrophes, and hyphens.",
             )
         ],
         widget=forms.TextInput(
@@ -43,7 +43,7 @@ class PaymentForm(forms.Form):
                 'class': 'form-control',
                 'placeholder': 'Name used in the GCash payment',
                 'inputmode': 'text',
-                'pattern': '[A-Za-z ]+',
+                'pattern': "[A-Za-z][A-Za-z .'-]*",
             }
         ),
     )
@@ -52,16 +52,16 @@ class PaymentForm(forms.Form):
         max_length=60,
         validators=[
             RegexValidator(
-                regex=r'^\d+$',
-                message='GCash reference number must contain numbers only.',
+                regex=r'^[A-Za-z0-9-]+$',
+                message='GCash reference number can use letters, numbers, and hyphens only.',
             )
         ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Reference number from your GCash receipt',
-                'inputmode': 'numeric',
-                'pattern': '\d+',
+                'inputmode': 'text',
+                'pattern': '[A-Za-z0-9-]+',
             }
         ),
     )
