@@ -331,7 +331,11 @@ def order_history(request):
 def order_detail(request, order_id):
     """Display single order details."""
     try:
-        order = get_object_or_404(Order, id=order_id, user=request.user)
+        order_lookup = {'id': order_id}
+        if not (request.user.is_staff or request.user.is_superuser):
+            order_lookup['user'] = request.user
+
+        order = get_object_or_404(Order, **order_lookup)
         items = OrderItem.objects.filter(order=order)
         for item in items:
             if item.selected_size and item.product.unit == 'cup':

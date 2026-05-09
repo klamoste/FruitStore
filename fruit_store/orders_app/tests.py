@@ -256,3 +256,74 @@ class CheckoutFlowTests(TestCase):
         self.assertEqual(Order.objects.count(), 0)
         self.product.refresh_from_db()
         self.assertEqual(self.product.stock_quantity, 10)
+
+
+class OrderDetailAccessTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = User.objects.create_user(
+            username='buyer2',
+            password='secret123',
+            first_name='Buyer',
+            last_name='Two',
+            email='buyer2@example.com',
+        )
+        Profile.objects.create(
+            user=cls.customer,
+            role='customer',
+            address='123 Mango Street',
+            contact_number='09171234567',
+            city='Quezon City',
+            state='Metro Manila',
+        )
+        cls.staff_user = User.objects.create_user(
+            username='adminviewer',
+            password='secret123',
+            is_staff=True,
+        )
+        Profile.objects.create(user=cls.staff_user, role='admin')
+        category = Category.objects.create(name='Imported', description='Imported fruit')
+        product = Product.objects.create(
+            name='Orange',
+            description='Fresh orange',
+            category=category,
+            price='125.00',
+            stock_quantity=20,
+            unit='piece',
+            is_available=True,
+        )
+        cls.order = Order.objects.create(
+            user=cls.customer,
+            total_price='175.00',
+            payment_method='COD',
+            delivery_date=timezone.localdate() + timedelta(days=1),
+            delivery_window='morning',
+            status='pending',
+        )
+        OrderItem.objects.create(
+            order=cls.order,
+            product=product,
+            quantity=1,
+            unit_price='125.00',
+            subtotal='125.00',
+        )
+
+    def test_staff_can_view_customer_order_detail(self):
+        self.client.login(username='adminviewer', password='secret123')
+
+        response = self.client.get(reverse('orders:order_detail', args=[self.order.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.order.order_code)
+
+    def test_other_customer_cannot_view_someone_elses_order_detail(self):
+        other_customer = User.objects.create_user(
+            username='otherbuyer',
+            password='secret123',
+        )
+        Profile.objects.create(user=other_customer, role='customer')
+        self.client.login(username='otherbuyer', password='secret123')
+
+        response = self.client.get(reverse('orders:order_detail', args=[self.order.id]))
+
+        self.assertEqual(response.status_code, 404)
