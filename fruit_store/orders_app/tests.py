@@ -137,6 +137,28 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(response, 'Sofia Fruit Store')
         self.assertContains(response, '09171234567')
 
+    def test_checkout_persists_cod_delivery_fields(self):
+        delivery_date = timezone.localdate() + timedelta(days=1)
+
+        response = self.client.post(
+            reverse('orders:checkout'),
+            data={
+                'payment_method': 'COD',
+                'delivery_date': delivery_date.isoformat(),
+                'delivery_window': 'morning',
+                'customer_note': 'Leave at the gate.',
+            },
+        )
+
+        order = Order.objects.get()
+
+        self.assertRedirects(response, reverse('orders:order_detail', args=[order.id]))
+        self.assertEqual(order.payment_method, 'COD')
+        self.assertEqual(order.delivery_date, delivery_date)
+        self.assertEqual(order.delivery_window, 'morning')
+        self.assertEqual(order.customer_note, 'Leave at the gate.')
+        self.assertEqual(order.total_price, Decimal('250.00'))
+
     def test_checkout_persists_delivery_and_gcash_fields(self):
         delivery_date = timezone.localdate() + timedelta(days=2)
 
@@ -206,5 +228,7 @@ class CheckoutFlowTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Please review these fields before placing your order:')
+        self.assertContains(response, 'Delivery date: Please choose a delivery date that is today or later.')
         self.assertContains(response, 'Please choose a delivery date that is today or later.')
         self.assertEqual(Order.objects.count(), 0)

@@ -195,6 +195,25 @@
         font-size: 0.9rem;
         margin-top: 0.5rem;
     }
+    .checkout-error-summary {
+        margin-top: 2rem;
+        border-radius: 1rem;
+        border: 1px solid #f3c3bf;
+        background: #fff6f5;
+        color: #8a1f17;
+        padding: 1rem 1.1rem;
+    }
+    .checkout-error-summary strong {
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+    .checkout-error-summary ul {
+        margin: 0;
+        padding-left: 1.2rem;
+    }
+    .checkout-error-summary li + li {
+        margin-top: 0.35rem;
+    }
     .place-order-btn {
         padding: 1.1rem 1.4rem;
         font-size: 1rem;
@@ -478,8 +497,18 @@
                         </div>
 
                         {% if form.errors %}
-                        <div class="alert alert-danger mt-4" role="alert">
-                            Please review the highlighted fields before placing your order.
+                        <div class="checkout-error-summary" id="checkoutErrorSummary" role="alert" tabindex="-1">
+                            <strong>Please review these fields before placing your order:</strong>
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
                         {% endif %}
 
@@ -543,6 +572,7 @@
         const gcashReferenceNumber = document.getElementById('{{ form.gcash_reference_number.id_for_label }}');
         const deliveryDateInput = document.getElementById('{{ form.delivery_date.id_for_label }}');
         const deliveryDateDay = document.getElementById('deliveryDateDay');
+        const checkoutErrorSummary = document.getElementById('checkoutErrorSummary');
 
         function toggleGcashFields() {
             const selected = document.querySelector('input[name="payment_method"]:checked');
@@ -616,6 +646,14 @@
         if (gcashReferenceNumber) {
             gcashReferenceNumber.addEventListener('input', sanitizeReferenceNumber);
             gcashReferenceNumber.addEventListener('change', sanitizeReferenceNumber);
+        }
+        if (checkoutErrorSummary) {
+            const firstInvalidField = document.querySelector('.field-errors')?.previousElementSibling;
+            checkoutErrorSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            checkoutErrorSummary.focus();
+            if (firstInvalidField && typeof firstInvalidField.focus === 'function') {
+                firstInvalidField.focus();
+            }
         }
     }());
 </script>
