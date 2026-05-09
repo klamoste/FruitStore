@@ -9,8 +9,10 @@ from .forms import CheckoutForm, PaymentForm
 from products_app.models import Product, InventoryLog
 from accounts_app.models import Profile
 from decimal import Decimal
+import logging
 
 SHIPPING_FEE = Decimal('50.00')
+logger = logging.getLogger(__name__)
 
 
 def get_cart_labels(product, item):
@@ -232,42 +234,54 @@ def checkout(request):
             
             # Create order
             try:
-                order = Order.objects.create(
-                    user=request.user,
-                    payment_method=payment_method,
-                    delivery_date=delivery_date,
-                    delivery_window=delivery_window,
-                    gcash_sender_name=gcash_sender_name,
-                    gcash_reference_number=gcash_reference_number,
-                    customer_note=customer_note,
-                    total_price=final_total,
-                    status='pending'
-                )
-                
-                for item in cart_items:
-                    product = item['product']
-                    quantity = item['quantity']
-                    subtotal = item['subtotal']
-                    
-                    OrderItem.objects.create(
-                        order=order,
-                        product=product,
-                        quantity=quantity,
-                        unit_price=item['unit_price'],
-                        selected_size=item['selected_size'],
-                        selected_unit_label=item['selected_label'],
-                        subtotal=subtotal
+                with transaction.atomic():
+                    order = Order.objects.create(
+                        user=request.user,
+                        payment_method=payment_method,
+                        delivery_date=delivery_date,
+                        delivery_window=delivery_window,
+                        gcash_sender_name=gcash_sender_name,
+                        gcash_reference_number=gcash_reference_number,
+                        customer_note=customer_note,
+                        total_price=final_total,
+                        status='pending'
                     )
-                    
-                    product.stock_quantity -= quantity
-                    product.save()
-                    
-                    InventoryLog.objects.create(
-                        product=product,
-                        change=-quantity,
-                        reason='sale'
-                    )
+
+                    for item in cart_items:
+                        product = Product.objects.select_for_update().get(id=item['product'].id)
+                        quantity = item['quantity']
+                        subtotal = item['subtotal']
+
+                        if quantity > product.stock_quantity:
+                            raise ValueError(
+                                f'Only {product.stock_quantity} items available for {product.name}.'
+                            )
+
+                        OrderItem.objects.create(
+                            order=order,
+                            product=product,
+                            quantity=quantity,
+                            unit_price=item['unit_price'],
+                            selected_size=item['selected_size'],
+                            selected_unit_label=item['selected_label'],
+                            subtotal=subtotal
+                        )
+
+                        product.stock_quantity -= quantity
+                        product.save(update_fields=['stock_quantity', 'updated_at'])
+
+                        InventoryLog.objects.create(
+                            product=product,
+                            change=-quantity,
+                            reason='sale'
+                        )
+            except ValueError as exc:
+                messages.error(request, str(exc))
             except DatabaseError:
+                logger.exception(
+                    'Checkout failed for user %s while writing order data.',
+                    request.user.pk,
+                )
                 messages.error(
                     request,
                     'We could not place your order because the database is temporarily unavailable.'

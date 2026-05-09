@@ -3,9 +3,11 @@ from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.db import DatabaseError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
+from unittest.mock import patch
 
 from accounts_app.models import Profile
 from orders_app.models import Order, OrderItem
@@ -232,3 +234,25 @@ class CheckoutFlowTests(TestCase):
         self.assertContains(response, 'Delivery date: Please choose a delivery date that is today or later.')
         self.assertContains(response, 'Please choose a delivery date that is today or later.')
         self.assertEqual(Order.objects.count(), 0)
+
+    def test_checkout_rolls_back_if_order_item_write_fails(self):
+        delivery_date = timezone.localdate() + timedelta(days=1)
+
+        with patch(
+            'orders_app.views.OrderItem.objects.create',
+            side_effect=DatabaseError('simulated write failure'),
+        ):
+            response = self.client.post(
+                reverse('orders:checkout'),
+                data={
+                    'payment_method': 'COD',
+                    'delivery_date': delivery_date.isoformat(),
+                    'delivery_window': 'morning',
+                },
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'We could not place your order because the database is temporarily unavailable.')
+        self.assertEqual(Order.objects.count(), 0)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock_quantity, 10)
