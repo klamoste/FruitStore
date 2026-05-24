@@ -4,17 +4,25 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-success mb-4">💳 Checkout</h2>
-    
+    <h2 class="text-success mb-4">Checkout</h2>
+
     <div class="row">
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h4 class="mb-4">Select Payment Method</h4>
-                    
+
                     <form method="post" novalidate>
                         {% csrf_token %}
-                        
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         <div class="mb-4">
                             {% for choice in form.payment_method %}
                                 <div class="form-check p-3 border rounded mb-2">
@@ -24,27 +32,108 @@
                                             <strong>Cash on Delivery</strong>
                                             <p class="text-muted small mb-0">Pay cash when your fruits are delivered to your door.</p>
                                         {% else %}
-                                            <strong>Mark as Paid</strong>
-                                            <p class="text-muted small mb-0">Order will be marked as paid immediately</p>
+                                            <strong>GCash</strong>
+                                            <p class="text-muted small mb-0">Provide your GCash payment details to mark the order as paid.</p>
                                         {% endif %}
                                     </label>
                                 </div>
                             {% endfor %}
+                            {% if form.payment_method.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.payment_method.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
-                        
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">GCash Details</h5>
+                            <div class="alert alert-light border">
+                                <div><strong>Account Name:</strong> {{ gcash_account_name }}</div>
+                                <div><strong>GCash Number:</strong> {{ gcash_number }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.gcash_sender_name.id_for_label }}" class="form-label">{{ form.gcash_sender_name.label }}</label>
+                                {{ form.gcash_sender_name }}
+                                {% if form.gcash_sender_name.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.gcash_sender_name.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.gcash_reference.id_for_label }}" class="form-label">{{ form.gcash_reference.label }}</label>
+                                {{ form.gcash_reference }}
+                                {% if form.gcash_reference.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.gcash_reference.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Delivery Schedule</h5>
+
+                            <div class="mb-3">
+                                <label for="{{ form.requested_delivery_date.id_for_label }}" class="form-label">{{ form.requested_delivery_date.label }}</label>
+                                {{ form.requested_delivery_date }}
+                                {% if form.requested_delivery_date.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.requested_delivery_date.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.requested_delivery_time.id_for_label }}" class="form-label">{{ form.requested_delivery_time.label }}</label>
+                                {{ form.requested_delivery_time }}
+                                {% if form.requested_delivery_time.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.requested_delivery_time.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.customer_note.id_for_label }}" class="form-label">{{ form.customer_note.label }}</label>
+                                {{ form.customer_note }}
+                                {% if form.customer_note.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.customer_note.errors %}
+                                            <div>{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <hr>
-                        
+
                         <h5 class="mb-3">Order Details</h5>
                         <p><strong>Total Items:</strong> {{ item_count }}</p>
-                        <p><strong>Total Amount:</strong> <h4 class="text-success">₱{{ total_price }}</h4></p>
-                        
+                        <p><strong>Subtotal:</strong> <span class="text-success">P{{ subtotal_price }}</span></p>
+                        <p><strong>Shipping Fee:</strong> <span class="text-success">P{{ shipping_fee }}</span></p>
+                        <p><strong>Total Amount:</strong> <span class="text-success fw-bold">P{{ final_total }}</span></p>
+
                         <hr>
-                        
+
                         <div class="alert alert-info">
-                            <strong>📦 Shipping Info:</strong><br>
-                            Order will be shipped to your registered address. Free shipping on all orders!
+                            <strong>Shipping Info:</strong><br>
+                            Order will be shipped to your registered address.
                         </div>
-                        
+
                         <button type="submit" class="btn btn-success btn-lg w-100">
                             Complete Order
                         </button>
@@ -52,7 +141,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white">
@@ -61,24 +150,24 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-3">
                         <span>Subtotal:</span>
-                        <span>₱{{ total_price }}</span>
+                        <span>P{{ subtotal_price }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span>Shipping:</span>
-                        <span class="text-success">FREE</span>
+                        <span>P{{ shipping_fee }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between">
                         <h5>Total:</h5>
-                        <h5 class="text-success">₱{{ total_price }}</h5>
+                        <h5 class="text-success">P{{ final_total }}</h5>
                     </div>
-                    
+
                     <hr>
-                    
+
                     <p class="text-muted small">
-                        ✅ Order protection included<br>
-                        ✅ Free returns for 30 days<br>
-                        ✅ 100% authentic products
+                        Order protection included<br>
+                        Delivery schedule confirmation at checkout<br>
+                        Fresh produce prepared for dispatch
                     </p>
                 </div>
             </div>

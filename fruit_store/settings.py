@@ -65,10 +65,6 @@ DEBUG = env_flag('DEBUG', default=True)
 VERCEL_ENV = os.environ.get('VERCEL') == '1'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver', '.vercel.app']
-render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if render_hostname:
-    ALLOWED_HOSTS.append(render_hostname)
-
 vercel_url = os.environ.get('VERCEL_URL')
 if vercel_url:
     ALLOWED_HOSTS.append(vercel_url)
@@ -78,8 +74,6 @@ if extra_hosts:
     ALLOWED_HOSTS.extend([host.strip() for host in extra_hosts.split(',') if host.strip()])
 
 CSRF_TRUSTED_ORIGINS = []
-if render_hostname:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{render_hostname}')
 if vercel_url:
     CSRF_TRUSTED_ORIGINS.append(f'https://{vercel_url}')
 
@@ -251,7 +245,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 force_https = env_flag('SECURE_SSL_REDIRECT', default=False)
-is_hosted_environment = bool(render_hostname or vercel_url or VERCEL_ENV)
+is_hosted_environment = bool(vercel_url or VERCEL_ENV)
 if not DEBUG and (force_https or is_hosted_environment):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
