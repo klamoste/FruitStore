@@ -43,6 +43,9 @@ def get_database_url():
     if not value:
         return ''
 
+    if os.environ.get('VERCEL') == '1' and not env_flag('VERCEL_USE_POSTGRES', default=False):
+        return ''
+
     lowered = value.lower()
     if any(token in lowered for token in ('@host:', '/dbname', '/database')):
         return ''
