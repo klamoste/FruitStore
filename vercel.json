@@ -2,6 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "python manage.py migrate --noinput && STATIC_ROOT=.vercel_static python manage.py collectstatic --noinput",
+  "outputDirectory": ".",
   "functions": {
     "api/index.py": {
       "includeFiles": "{fruit_store/**,templates/**,.vercel_static/**,db.sqlite3}"
