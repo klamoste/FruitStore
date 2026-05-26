@@ -2,11 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "python manage.py migrate --noinput && STATIC_ROOT=.vercel_static python manage.py collectstatic --noinput",
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.12"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
