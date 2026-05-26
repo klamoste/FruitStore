@@ -5,6 +5,7 @@ whitenoise
 dj-database-url
 psycopg>=3.2,<3.3
 psycopg-binary>=3.2,<3.3
+typing_extensions>=4.12
 cloudinary
 django-cloudinary-storage
 # For PostgreSQL: psycopg2-binary
