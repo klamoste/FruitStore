@@ -43,15 +43,11 @@ def get_database_url():
     if not value:
         return ''
 
-    vercel_runtime = any(
-        (
-            os.environ.get('VERCEL') == '1',
-            os.environ.get('VERCEL_ENV'),
-            os.environ.get('VERCEL_URL'),
-            os.environ.get('NOW_REGION'),
-        )
+    allow_database_url = env_flag('USE_DATABASE_URL', default=False) or env_flag(
+        'VERCEL_USE_POSTGRES',
+        default=False,
     )
-    if vercel_runtime and not env_flag('VERCEL_USE_POSTGRES', default=False):
+    if not allow_database_url:
         return ''
 
     lowered = value.lower()
