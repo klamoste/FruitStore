@@ -69,7 +69,7 @@ class ProfileEditForm(forms.Form):
         choices=Profile.AVATAR_TEMPLATE_CHOICES,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    profile_image = forms.ImageField(
+    profile_image = forms.FileField(
         required=False,
         widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
     )

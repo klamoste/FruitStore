@@ -1,5 +1,4 @@
 Django>=4.2
-Pillow
 gunicorn
 whitenoise
 dj-database-url
