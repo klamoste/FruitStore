@@ -107,7 +107,7 @@
 
 {% block content %}
 <div class="container-xl order-detail-page">
-    <a href="{% url 'orders:order_history' %}" style="color: var(--primary-green); text-decoration: none; font-weight: 600; margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+    <a href="{{ back_url }}" style="color: var(--primary-green); text-decoration: none; font-weight: 600; margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem;">
         <i class="fas fa-arrow-left"></i> Back to Orders
     </a>
     
@@ -145,18 +145,35 @@
                     {% endif %}
 
                     <div style="margin-bottom: 2rem; padding: 1rem 1.1rem; border-radius: 0.75rem; background: #fffdf6; border: 1px solid #efe3b2;">
-                        <h6 style="font-weight: 700; margin-bottom: 0.9rem; color: var(--primary-green);">Payment and Delivery Details</h6>
+                        <h6 style="font-weight: 700; margin-bottom: 0.9rem; color: var(--primary-green);">Payment and Fulfillment Details</h6>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Fulfillment</span>
+                            <span style="font-weight: 600;">{{ order.get_fulfillment_method_display }}</span>
+                        </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Payment Method</span>
                             <span style="font-weight: 600;">{{ order.get_payment_method_display }}</span>
                         </div>
                         <div class="order-summary-row">
-                            <span style="color: #666;">Delivery Date</span>
+                            <span style="color: #666;">{% if order.fulfillment_method == 'pickup' %}Pickup Date{% else %}Delivery Date{% endif %}</span>
                             <span style="font-weight: 600;">{{ order.delivery_date|date:"M d, Y"|default:"Not set" }}</span>
                         </div>
                         <div class="order-summary-row" style="margin-bottom: 0;">
-                            <span style="color: #666;">Delivery Window</span>
+                            <span style="color: #666;">{% if order.fulfillment_method == 'pickup' %}Pickup Window{% else %}Delivery Window{% endif %}</span>
                             <span style="font-weight: 600;">{{ order.get_delivery_window_display|default:"Not set" }}</span>
+                        </div>
+                        <hr style="margin: 1rem 0;">
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Zone</span>
+                            <span style="font-weight: 600;">{{ shipping_zone_name }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Area</span>
+                            <span style="font-weight: 600;">{{ shipping_location_name }}</span>
+                        </div>
+                        <div class="order-summary-row" style="margin-bottom: 0;">
+                            <span style="color: #666;">Estimated Arrival</span>
+                            <span style="font-weight: 600;">{{ shipping_eta_label }}</span>
                         </div>
                         {% if order.payment_method == 'GCASH' %}
                         <hr style="margin: 1rem 0;">
@@ -177,13 +194,13 @@
                     <div class="order-item-row">
                         <img
                             class="order-item-image"
-                            src="{% if item.product.image %}{{ item.product.image.url }}{% else %}data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='16' fill='%23eef6ef'/%3E%3Cpath d='M24 79l22-22 15 15 14-17 21 24' fill='none' stroke='%232f7d5b' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='41' cy='40' r='9' fill='%23f3b63f'/%3E%3Ctext x='60' y='104' text-anchor='middle' font-family='Arial,sans-serif' font-size='12' fill='%232f7d5b'%3EFruit%3C/text%3E%3C/svg%3E{% endif %}"
-                            alt="{{ item.product.name }}"
+                            src="{% if item.product and item.product.image %}{{ item.product.image.url }}{% else %}data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='16' fill='%23eef6ef'/%3E%3Cpath d='M24 79l22-22 15 15 14-17 21 24' fill='none' stroke='%232f7d5b' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='41' cy='40' r='9' fill='%23f3b63f'/%3E%3Ctext x='60' y='104' text-anchor='middle' font-family='Arial,sans-serif' font-size='12' fill='%232f7d5b'%3EFruit%3C/text%3E%3C/svg%3E{% endif %}"
+                            alt="{{ item.display_name }}"
                             onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 120 120%22%3E%3Crect width=%22120%22 height=%22120%22 rx=%2216%22 fill=%22%23eef6ef%22/%3E%3Cpath d=%22M24 79l22-22 15 15 14-17 21 24%22 fill=%22none%22 stroke=%22%232f7d5b%22 stroke-width=%228%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241%22 cy=%2240%22 r=%229%22 fill=%22%23f3b63f%22/%3E%3Ctext x=%2260%22 y=%22104%22 text-anchor=%22middle%22 font-family=%22Arial,sans-serif%22 font-size=%2212%22 fill=%22%232f7d5b%22%3EFruit%3C/text%3E%3C/svg%3E';">
                         
                         <div style="flex: 1;">
-                            <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.product.name }}</h5>
-                            <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">{{ item.product.category.name }}</p>
+                            <h5 style="font-weight: 700; margin-bottom: 0.5rem;">{{ item.display_name }}</h5>
+                            <p style="color: #999; margin-bottom: 1rem; font-size: 0.9rem;">{{ item.display_category }}</p>
                             {% if item.selected_size %}
                             <p style="color: var(--primary-green); margin: -0.4rem 0 1rem; font-size: 0.9rem; font-weight: 700;">Selected: {{ item.display_selected_label }}</p>
                             {% endif %}
@@ -212,24 +229,42 @@
                             <span style="font-weight: 600;">{{ order.order_code }}</span>
                         </div>
                         <div class="order-summary-row">
+                            <span style="color: #666;">Fulfillment</span>
+                            <span style="font-weight: 600;">{{ order.get_fulfillment_method_display }}</span>
+                        </div>
+                        <div class="order-summary-row">
                             <span style="color: #666;">Payment</span>
                             <span style="font-weight: 600;">{{ order.get_payment_method_display }}</span>
                         </div>
                         <div class="order-summary-row">
-                            <span style="color: #666;">Delivery</span>
+                            <span style="color: #666;">{% if order.fulfillment_method == 'pickup' %}Pickup{% else %}Delivery{% endif %}</span>
                             <span style="font-weight: 600;">{{ order.delivery_date|date:"M d, Y"|default:"Not set" }}</span>
                         </div>
                         <div class="order-summary-row">
-                            <span style="color: #666;">Window</span>
+                            <span style="color: #666;">Zone</span>
+                            <span style="font-weight: 600;">{{ shipping_zone_name }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">ETA</span>
+                            <span style="font-weight: 600;">{{ shipping_eta_label }}</span>
+                        </div>
+                        <div class="order-summary-row">
+                            <span style="color: #666;">{% if order.fulfillment_method == 'pickup' %}Pickup Window{% else %}Delivery Window{% endif %}</span>
                             <span style="font-weight: 600;">{{ order.get_delivery_window_display|default:"Not set" }}</span>
                         </div>
+                        {% if order.assigned_courier %}
+                        <div class="order-summary-row">
+                            <span style="color: #666;">Courier</span>
+                            <span style="font-weight: 600;">{{ order.assigned_courier }}</span>
+                        </div>
+                        {% endif %}
                         <div class="order-summary-row">
                             <span style="color: #666;">Subtotal</span>
                             <span style="font-weight: 600;">&#8369;{{ subtotal_price }}</span>
                         </div>
                         <div class="order-summary-row">
-                            <span style="color: #666;">Shipping</span>
-                            <span style="font-weight: 600;">&#8369;{{ shipping_fee }}</span>
+                            <span style="color: #666;">{% if order.fulfillment_method == 'pickup' %}Pickup{% else %}Shipping{% endif %}</span>
+                            <span style="font-weight: 600;">{% if order.fulfillment_method == 'pickup' %}Free{% else %}&#8369;{{ shipping_fee }}{% endif %}</span>
                         </div>
                         <div class="order-summary-row">
                             <span style="color: #666;">Total</span>

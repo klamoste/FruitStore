@@ -59,6 +59,7 @@
         margin-bottom: 1rem;
     }
     .payment-options,
+    .fulfillment-options,
     .delivery-window-options {
         display: grid;
         gap: 1rem;
@@ -94,6 +95,7 @@
         line-height: 1.5;
     }
     .payment-option,
+    .fulfillment-option,
     .delivery-window-option {
         display: flex;
         align-items: center;
@@ -106,11 +108,13 @@
         cursor: pointer;
     }
     .payment-option:hover,
+    .fulfillment-option:hover,
     .delivery-window-option:hover {
         border-color: rgba(45, 122, 90, 0.35);
         transform: translateY(-1px);
     }
     .payment-option input[type="radio"],
+    .fulfillment-option input[type="radio"],
     .delivery-window-option input[type="radio"] {
         accent-color: var(--primary-green);
         width: 1.2rem;
@@ -119,11 +123,13 @@
         flex-shrink: 0;
     }
     .payment-option-content,
+    .fulfillment-option-content,
     .delivery-window-content {
         flex: 1;
         min-width: 0;
     }
     .payment-option-title,
+    .fulfillment-option-title,
     .delivery-window-title {
         font-weight: 700;
         color: #1f5540;
@@ -131,6 +137,7 @@
         font-size: 1.05rem;
     }
     .payment-option-description,
+    .fulfillment-option-description,
     .delivery-window-description {
         color: #5f6e60;
         line-height: 1.6;
@@ -318,6 +325,7 @@
             font-size: 2rem;
         }
         .payment-option,
+        .fulfillment-option,
         .delivery-window-option {
             align-items: flex-start;
             padding: 1rem;
@@ -358,7 +366,7 @@
                         <div>
                             <span class="text-success fw-semibold text-uppercase" style="letter-spacing: 0.12em; font-size: 0.85rem;">Checkout</span>
                             <h1>Complete your order</h1>
-                            <p>Choose your payment method, pick your delivery schedule, and confirm your fresh fruit order.</p>
+                            <p>Choose delivery or store pickup, select your payment method, and confirm your fresh fruit order.</p>
                         </div>
                     </div>
                 </div>
@@ -371,6 +379,31 @@
                             {{ form.non_field_errors|join:", " }}
                         </div>
                         {% endif %}
+
+                        <div class="checkout-section">
+                            <h4>Fulfillment Method</h4>
+                            <p class="checkout-section-copy">Choose whether you want the order delivered or picked up at the store.</p>
+                            <div class="fulfillment-options">
+                                {% for radio in form.fulfillment_method %}
+                                <label class="fulfillment-option">
+                                    {{ radio.tag }}
+                                    <div class="fulfillment-option-content">
+                                        <div class="fulfillment-option-title">{{ radio.choice_label }}</div>
+                                        <div class="fulfillment-option-description">
+                                            {% if radio.data.value == "delivery" %}
+                                                Deliver this order to your saved address in {{ delivery_location_name }}. This currently falls under our {{ delivery_zone_name|lower }} with a Php {{ delivery_shipping_fee }} fee and an estimated arrival of {{ delivery_eta_label|lower }}.
+                                            {% else %}
+                                                Pick up the order yourself at the store and skip the shipping fee.
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            {% if form.fulfillment_method.errors %}
+                            <div class="field-errors">{{ form.fulfillment_method.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
 
                         <div class="checkout-section">
                             <h4>Payment Method</h4>
@@ -447,19 +480,19 @@
                         </div>
 
                         <div class="checkout-section">
-                            <h4>Delivery Schedule</h4>
-                            <p class="checkout-section-copy">Pick your preferred date and delivery window before placing the order.</p>
+                            <h4 id="scheduleTitle">Delivery Schedule</h4>
+                            <p class="checkout-section-copy" id="scheduleCopy">Pick your preferred date and delivery window before placing the order.</p>
                             <div class="checkout-grid">
                                 <div class="checkout-field">
-                                    <label for="{{ form.delivery_date.id_for_label }}">Delivery Date</label>
+                                    <label for="{{ form.delivery_date.id_for_label }}" id="scheduleDateLabel">Delivery Date</label>
                                     {{ form.delivery_date }}
                                     <div class="checkout-field-help" id="deliveryDateDay" aria-live="polite"></div>
                                     {% if form.delivery_date.errors %}
                                     <div class="field-errors">{{ form.delivery_date.errors|join:", " }}</div>
                                     {% endif %}
                                 </div>
-                                <div class="checkout-field">
-                                    <label>Delivery Window</label>
+                                <div class="checkout-field" id="deliveryWindowField">
+                                    <label id="scheduleWindowLabel">Delivery Window</label>
                                     <div class="delivery-window-options">
                                         {% for radio in form.delivery_window %}
                                         <label class="delivery-window-option">
@@ -517,7 +550,7 @@
                         </button>
                     </form>
 
-                    <p class="checkout-note">A fixed shipping fee of Php {{ shipping_fee }} is included in the total below.</p>
+                    <p class="checkout-note" id="checkoutNote">Delivery to {{ delivery_location_name }} currently uses our {{ delivery_zone_name|lower }} fee of Php {{ delivery_shipping_fee }} with an estimated arrival of {{ delivery_eta_label|lower }}, while store pickup is free.</p>
                 </div>
             </div>
         </div>
@@ -550,13 +583,13 @@
                     <div class="fw-semibold">Php {{ subtotal_price }}</div>
                 </div>
                 <div class="summary-item mb-0">
-                    <div class="summary-item-meta">Shipping</div>
-                    <div class="fw-semibold">Php {{ shipping_fee }}</div>
+                    <div class="summary-item-meta" id="shippingLabel">Shipping</div>
+                    <div class="fw-semibold" id="shippingValue">Php {{ shipping_fee }}</div>
                 </div>
 
                 <div class="summary-total">
                     <strong>Total</strong>
-                    <span class="summary-total-value">Php {{ final_total }}</span>
+                    <span class="summary-total-value" id="totalValue">Php {{ final_total }}</span>
                 </div>
             </div>
         </div>
@@ -567,12 +600,31 @@
     (function () {
         const gcashFields = document.getElementById('gcashFields');
         const gcashAccountCard = document.getElementById('gcashAccountCard');
+        const fulfillmentInputs = document.querySelectorAll('input[name="fulfillment_method"]');
         const paymentInputs = document.querySelectorAll('input[name="payment_method"]');
         const gcashSenderName = document.getElementById('{{ form.gcash_sender_name.id_for_label }}');
         const gcashReferenceNumber = document.getElementById('{{ form.gcash_reference_number.id_for_label }}');
         const deliveryDateInput = document.getElementById('{{ form.delivery_date.id_for_label }}');
         const deliveryDateDay = document.getElementById('deliveryDateDay');
+        const deliveryWindowField = document.getElementById('deliveryWindowField');
+        const deliveryWindowInputs = document.querySelectorAll('input[name="delivery_window"]');
+        const scheduleTitle = document.getElementById('scheduleTitle');
+        const scheduleCopy = document.getElementById('scheduleCopy');
+        const scheduleDateLabel = document.getElementById('scheduleDateLabel');
+        const shippingLabel = document.getElementById('shippingLabel');
+        const shippingValue = document.getElementById('shippingValue');
+        const totalValue = document.getElementById('totalValue');
+        const checkoutNote = document.getElementById('checkoutNote');
         const checkoutErrorSummary = document.getElementById('checkoutErrorSummary');
+        const subtotalAmount = Number('{{ subtotal_price }}');
+        const deliveryShippingFee = Number('{{ delivery_shipping_fee }}');
+        const deliveryZoneName = '{{ delivery_zone_name|escapejs }}';
+        const deliveryLocationName = '{{ delivery_location_name|escapejs }}';
+        const deliveryEtaLabel = '{{ delivery_eta_label|escapejs }}';
+
+        function getSelectedFulfillment() {
+            return document.querySelector('input[name="fulfillment_method"]:checked');
+        }
 
         function toggleGcashFields() {
             const selected = document.querySelector('input[name="payment_method"]:checked');
@@ -589,6 +641,48 @@
             }
             if (gcashReferenceNumber) {
                 gcashReferenceNumber.required = isGCash;
+            }
+        }
+
+        function updateFulfillmentFields() {
+            const selected = getSelectedFulfillment();
+            const isPickup = !!selected && selected.value === 'pickup';
+            const shippingFee = isPickup ? 0 : deliveryShippingFee;
+            const total = subtotalAmount + shippingFee;
+
+            if (scheduleTitle) {
+                scheduleTitle.textContent = isPickup ? 'Pickup Schedule' : 'Delivery Schedule';
+            }
+            if (scheduleCopy) {
+                scheduleCopy.textContent = isPickup
+                    ? 'Choose when you plan to pick up your order at the store.'
+                    : 'Pick your preferred date and delivery window before placing the order.';
+            }
+            if (scheduleDateLabel) {
+                scheduleDateLabel.textContent = isPickup ? 'Pickup Date' : 'Delivery Date';
+            }
+            if (deliveryWindowField) {
+                deliveryWindowField.style.display = isPickup ? 'none' : '';
+            }
+            deliveryWindowInputs.forEach((input) => {
+                input.required = !isPickup;
+                if (isPickup) {
+                    input.checked = false;
+                }
+            });
+            if (shippingLabel) {
+                shippingLabel.textContent = isPickup ? 'Pickup' : 'Shipping';
+            }
+            if (shippingValue) {
+                shippingValue.textContent = isPickup ? 'Free' : 'Php ' + shippingFee.toFixed(2);
+            }
+            if (totalValue) {
+                totalValue.textContent = 'Php ' + total.toFixed(2);
+            }
+            if (checkoutNote) {
+                checkoutNote.textContent = isPickup
+                    ? 'Store pickup removes the shipping fee from your order total.'
+                    : 'Delivery to ' + deliveryLocationName + ' uses our ' + deliveryZoneName.toLowerCase() + ' fee of Php ' + deliveryShippingFee.toFixed(2) + ' with an estimated arrival of ' + deliveryEtaLabel.toLowerCase() + '.';
             }
         }
 
@@ -628,11 +722,15 @@
             });
         }
 
+        fulfillmentInputs.forEach((input) => {
+            input.addEventListener('change', updateFulfillmentFields);
+        });
         paymentInputs.forEach((input) => {
             input.addEventListener('change', toggleGcashFields);
         });
 
         toggleGcashFields();
+        updateFulfillmentFields();
         updateDeliveryDay();
 
         if (deliveryDateInput) {

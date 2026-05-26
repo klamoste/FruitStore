@@ -3,6 +3,49 @@
 
 {% block title %}Home - Fresh Fruits Delivered Daily{% endblock %}
 
+{% block extra_css %}
+<style>
+    .home-cta-section {
+        padding: 0 0 4rem;
+    }
+
+    .home-cta-card {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%);
+        color: white;
+        padding: 4rem 2rem;
+        border-radius: 1.5rem;
+        text-align: center;
+    }
+
+    .home-cta-card h2 {
+        font-size: clamp(2rem, 4vw, 2.5rem);
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .home-cta-card p {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    @media (max-width: 768px) {
+        .home-cta-section {
+            padding-bottom: 2rem;
+        }
+
+        .home-cta-card {
+            padding: 2.5rem 1.25rem;
+            border-radius: 1.1rem;
+        }
+
+        .home-cta-card p {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- ===== HERO SECTION ===== -->
 <section class="hero-section">
@@ -77,14 +120,16 @@
 </section>
 
 <!-- ===== CTA SECTION ===== -->
-<section style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--light-green) 100%); color: white; padding: 4rem 0; border-radius: 1rem; text-align: center; margin: 4rem 0;">
+<section class="home-cta-section">
     <div class="container-xl">
-        <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem;">Ready to Order?</h2>
-        <p style="font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9;">Browse our collection and get farm-fresh fruits delivered to you.</p>
-        <a href="{% url 'products:product_list' %}" class="btn-primary-custom" style="background: white; color: var(--primary-green); border: 2px solid white;">
-            Start Shopping
-            <i class="fas fa-arrow-right"></i>
-        </a>
+        <div class="home-cta-card">
+            <h2>Ready to Order?</h2>
+            <p>Browse our collection and get farm-fresh fruits delivered to you.</p>
+            <a href="{% url 'products:product_list' %}" class="btn-primary-custom" style="background: white; color: var(--primary-green); border: 2px solid white;">
+                Start Shopping
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
     </div>
 </section>
 

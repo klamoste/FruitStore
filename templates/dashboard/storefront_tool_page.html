@@ -1,0 +1,23 @@
+{% extends 'dashboard/tool_page.html' %}
+
+{% block tool_content %}
+<div class="tool-panel">
+    <h2 style="font-weight: 800; color: #17392d; margin-bottom: 1rem;">Storefront Preview Items</h2>
+    {% if featured_products %}
+    <div class="row g-4">
+        {% for product in featured_products %}
+        <div class="col-md-6 col-xl-4">
+            <div class="tool-card h-100">
+                <div class="tool-label">{{ product.category.name }}</div>
+                <div class="tool-value" style="font-size: 1.35rem;">{{ product.name }}</div>
+                <p class="tool-copy">{{ product.description|truncatechars:100 }}</p>
+                <div class="tool-copy"><strong>PHP {{ product.price|floatformat:2 }}</strong></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="tool-copy mb-0">No storefront products are available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

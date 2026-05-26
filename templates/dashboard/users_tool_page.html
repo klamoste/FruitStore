@@ -1,0 +1,69 @@
+{% extends 'dashboard/tool_page.html' %}
+
+{% block tool_content %}
+<div class="tool-panel">
+    <h2 style="font-weight: 800; color: #17392d; margin-bottom: 1rem;">Latest Accounts</h2>
+    {% if users %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for account in users %}
+                <tr>
+                    <td>{{ account.username }}</td>
+                    <td>{{ account.email|default:'-' }}</td>
+                    <td>
+                        {% if account.is_superuser %}
+                        Superuser
+                        {% elif account.profile %}
+                        {{ account.profile.get_role_display }}
+                        {% elif account.is_staff %}
+                        Staff
+                        {% else %}
+                        Customer
+                        {% endif %}
+                    </td>
+                    <td>{% if account.is_active %}Active{% else %}Disabled{% endif %}</td>
+                    <td>{{ account.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        {% if account.profile and account.profile.role == 'customer' and not account.is_staff and not account.is_superuser %}
+                        <form method="post" style="margin: 0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="remove_customer_id" value="{{ account.id }}">
+                            <button
+                                type="submit"
+                                class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('Remove customer {{ account.username|escapejs }}? Accounts with order history will be disabled instead of permanently deleted.');"
+                            >
+                                Delete Customer
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">Protected</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="tool-copy mb-0">No users found yet.</p>
+    {% endif %}
+</div>
+
+<div class="tool-panel">
+    <h2 style="font-weight: 800; color: #17392d; margin-bottom: 0.4rem;">Create Customer Account</h2>
+    <p class="tool-copy mb-3">Need to add a new shopper? Open the customer account form from here. Customer accounts with order history are disabled instead of fully deleted.</p>
+    <a href="{% url 'dashboard:create_customer_tool_page' %}" class="btn-primary-custom">Create Customer</a>
+</div>
+{% endblock %}

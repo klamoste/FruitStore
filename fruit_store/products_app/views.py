@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from django.db import DatabaseError
 from django.db.models import Q
 from django.http import JsonResponse
+from accounts_app.models import Profile
 from .models import Product, Category, InventoryLog
 from .forms import ProductSearchForm, AddToCartForm
 from orders_app.models import Order, OrderItem
@@ -292,6 +293,12 @@ def product_detail(request, pk):
     form = AddToCartForm()
     cup_size_options = product.available_cup_sizes
     default_cup_option = cup_size_options[0] if cup_size_options else None
+    preview_readonly = False
+    if request.user.is_authenticated:
+        if request.user.is_superuser or request.user.is_staff:
+            preview_readonly = True
+        else:
+            preview_readonly = Profile.objects.filter(user=request.user, role__in=['admin', 'staff']).exists()
     
     context = {
         'product': product,
@@ -299,6 +306,7 @@ def product_detail(request, pk):
         'cup_size_options': cup_size_options,
         'default_cup_option': default_cup_option,
         'catalog_readonly': catalog_readonly,
+        'preview_readonly': preview_readonly,
     }
     return render(request, 'products/product_detail.html', context)
 

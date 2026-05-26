@@ -1,0 +1,69 @@
+{% extends 'dashboard/tool_page.html' %}
+
+{% block tool_content %}
+<div class="tool-panel">
+    <h2 style="font-weight: 800; color: #17392d; margin-bottom: 0.4rem;">Create Customer Account</h2>
+    <p class="tool-copy">Add a shopper account here without opening Django admin. New accounts are created as standard customers.</p>
+    <form method="post" class="row g-3">
+        {% csrf_token %}
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+            {{ form.username }}
+            {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.password1.id_for_label }}">Password</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.password2.id_for_label }}">Confirm Password</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.contact_number.id_for_label }}">Contact Number</label>
+            {{ form.contact_number }}
+            {% if form.contact_number.errors %}<div class="text-danger small mt-1">{{ form.contact_number.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.address.id_for_label }}">Address</label>
+            {{ form.address }}
+            {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.city.id_for_label }}">City</label>
+            {{ form.city }}
+            {% if form.city.errors %}<div class="text-danger small mt-1">{{ form.city.errors|join:', ' }}</div>{% endif %}
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="{{ form.state.id_for_label }}">Province / State</label>
+            {{ form.state }}
+            {% if form.state.errors %}<div class="text-danger small mt-1">{{ form.state.errors|join:', ' }}</div>{% endif %}
+        </div>
+        {% if form.non_field_errors %}
+        <div class="col-12">
+            <div class="text-danger small">{{ form.non_field_errors|join:', ' }}</div>
+        </div>
+        {% endif %}
+        <div class="col-12">
+            <button type="submit" class="btn-primary-custom">Create Customer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

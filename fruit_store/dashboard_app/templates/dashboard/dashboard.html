@@ -1,157 +1,657 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Dashboard - Fruit Store{% endblock %}
+{% block title %}Owner Dashboard - Sofia's Fruit Store{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-shell {
+        background:
+            radial-gradient(circle at top left, rgba(74, 159, 125, 0.16), transparent 28%),
+            linear-gradient(180deg, #eff8f4 0%, #f8fbf9 42%, #ffffff 100%);
+        padding: 2rem 0 4rem;
+    }
+
+    .dashboard-hero,
+    .dashboard-panel,
+    .metric-card {
+        border: 1px solid rgba(31, 85, 64, 0.08);
+        border-radius: 1.5rem;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 18px 40px rgba(31, 85, 64, 0.08);
+    }
+
+    .dashboard-hero {
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(45, 122, 90, 0.1);
+        color: var(--accent-green);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .dashboard-hero h1 {
+        margin: 1rem 0 0.75rem;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        font-weight: 800;
+        color: #17392d;
+    }
+
+    .dashboard-hero p {
+        margin: 0;
+        max-width: 48rem;
+        color: #4f635c;
+        font-size: 1.02rem;
+        line-height: 1.7;
+    }
+
+    .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem;
+        margin-top: 1.25rem;
+    }
+
+    .hero-chip {
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        background: #f4faf7;
+        color: #27473b;
+        min-width: 11rem;
+    }
+
+    .hero-chip strong {
+        display: block;
+        font-size: 1.1rem;
+        color: #18392d;
+    }
+
+    .metric-card {
+        height: 100%;
+        padding: 1.25rem;
+    }
+
+    .metric-label {
+        color: #648074;
+        font-size: 0.84rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+    }
+
+    .metric-value {
+        margin: 0.65rem 0 0.35rem;
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 800;
+        color: #17392d;
+    }
+
+    .metric-note {
+        margin: 0;
+        color: #698378;
+        font-size: 0.95rem;
+    }
+
+    .dashboard-panel {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .panel-head h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #17392d;
+    }
+
+    .panel-head p {
+        margin: 0.35rem 0 0;
+        color: #698378;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+
+    .status-card {
+        padding: 1rem;
+        border-radius: 1.1rem;
+        background: #f7faf8;
+        border: 1px solid rgba(31, 85, 64, 0.08);
+    }
+
+    .status-card strong {
+        display: block;
+        font-size: 1.9rem;
+        color: #17392d;
+    }
+
+    .status-card span {
+        color: #4f635c;
+        font-weight: 600;
+    }
+
+    .tone-amber { box-shadow: inset 0 0 0 2px rgba(245, 158, 11, 0.18); }
+    .tone-blue { box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.18); }
+    .tone-slate { box-shadow: inset 0 0 0 2px rgba(100, 116, 139, 0.18); }
+    .tone-green { box-shadow: inset 0 0 0 2px rgba(34, 197, 94, 0.18); }
+    .tone-red { box-shadow: inset 0 0 0 2px rgba(239, 68, 68, 0.18); }
+
+    .bar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 0.85rem;
+        align-items: end;
+        min-height: 220px;
+    }
+
+    .bar-col {
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: stretch;
+        gap: 0.65rem;
+    }
+
+    .bar-value {
+        text-align: center;
+        color: #3b5d50;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .bar {
+        border-radius: 1rem 1rem 0.5rem 0.5rem;
+        background: linear-gradient(180deg, #5eb48d 0%, #2d7a5a 100%);
+        min-height: 12px;
+    }
+
+    .bar-label {
+        text-align: center;
+        color: #6d857b;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .mini-list,
+    .data-table {
+        margin: 0;
+    }
+
+    .mini-list-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid rgba(31, 85, 64, 0.08);
+    }
+
+    .mini-list-item:last-child {
+        border-bottom: 0;
+    }
+
+    .mini-list-item strong,
+    .customer-card strong {
+        color: #17392d;
+    }
+
+    .muted-copy {
+        color: #6d857b;
+    }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(45, 122, 90, 0.1);
+        color: var(--accent-green);
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+
+    .pill-danger {
+        background: rgba(220, 38, 38, 0.12);
+        color: #b42318;
+    }
+
+    .customer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .customer-card {
+        padding: 1rem;
+        border-radius: 1.15rem;
+        background: #f8fbf9;
+        border: 1px solid rgba(31, 85, 64, 0.08);
+    }
+
+    .data-table {
+        width: 100%;
+    }
+
+    .data-table th {
+        color: #587368;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        border-bottom-width: 1px;
+    }
+
+    .data-table td {
+        vertical-align: middle;
+        color: #27473b;
+    }
+
+    .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.85rem;
+    }
+
+    .empty-state {
+        margin: 0;
+        padding: 1rem 0;
+        color: #698378;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-shell {
+            padding-top: 1.25rem;
+        }
+
+        .dashboard-hero,
+        .dashboard-panel,
+        .metric-card {
+            border-radius: 1.2rem;
+        }
+
+        .dashboard-hero,
+        .dashboard-panel {
+            padding: 1.2rem;
+        }
+
+        .hero-chip {
+            min-width: unset;
+            flex: 1 1 100%;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-5">
-    <h1 class="text-success mb-4">📊 Admin Dashboard</h1>
-    
-    <!-- Key Metrics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card shadow-sm border-success">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Orders</h6>
-                    <h2 class="text-success">{{ total_orders }}</h2>
+<section class="dashboard-shell">
+    <div class="container-xl">
+        <div class="dashboard-hero">
+            <span class="eyebrow">
+                <i class="fas fa-chart-line"></i>
+                Owner Control Center
+            </span>
+            <h1>Monitor sales, stock, customers, and order flow in one place.</h1>
+            <p>
+                This dashboard gives the store owner a live picture of how the business is moving,
+                what needs attention, and where sales are coming from.
+            </p>
+            <div class="hero-meta">
+                <div class="hero-chip">
+                    <span class="muted-copy">Orders today</span>
+                    <strong>{{ orders_today }}</strong>
+                </div>
+                <div class="hero-chip">
+                    <span class="muted-copy">Revenue today</span>
+                    <strong>PHP {{ revenue_today|floatformat:2 }}</strong>
+                </div>
+                <div class="hero-chip">
+                    <span class="muted-copy">Delivered today</span>
+                    <strong>{{ delivered_today }}</strong>
+                </div>
+                <div class="hero-chip">
+                    <span class="muted-copy">Last order activity</span>
+                    <strong>{% if latest_order_at %}{{ latest_order_at|date:"M d, Y g:i A" }}{% else %}No orders yet{% endif %}</strong>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-success">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Revenue</h6>
-                    <h2 class="text-success">₱{{ total_revenue }}</h2>
+
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-label">Total Revenue</div>
+                    <div class="metric-value">PHP {{ total_revenue|floatformat:2 }}</div>
+                    <p class="metric-note">Across all non-cancelled orders.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-label">Orders</div>
+                    <div class="metric-value">{{ total_orders }}</div>
+                    <p class="metric-note">Average order value: PHP {{ avg_order_value|floatformat:2 }}</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-label">Items Sold</div>
+                    <div class="metric-value">{{ total_items_sold }}</div>
+                    <p class="metric-note">Confirmed from paid, shipped, and delivered orders.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="metric-card">
+                    <div class="metric-label">Customer Reach</div>
+                    <div class="metric-value">{{ active_customers }}</div>
+                    <p class="metric-note">{{ total_users }} total accounts, {{ new_users_30_days }} joined in the last 30 days.</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-success">
-                <div class="card-body">
-                    <h6 class="text-muted">Items Sold</h6>
-                    <h2 class="text-success">{{ total_items_sold }}</h2>
+
+        <div class="dashboard-panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Order Pipeline</h2>
+                    <p>See which stage is building up so you can act quickly.</p>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-success">
-                <div class="card-body">
-                    <h6 class="text-muted">Avg Order Value</h6>
-                    <h2 class="text-success">₱{{ total_revenue|floatformat:2|default:"0.00" }}</h2>
-                </div>
+            <div class="status-grid">
+                {% for card in status_cards %}
+                    <div class="status-card tone-{{ card.tone }}">
+                        <strong>{{ card.count }}</strong>
+                        <span>{{ card.label }}</span>
+                    </div>
+                {% endfor %}
             </div>
         </div>
-    </div>
-    
-    <!-- Order Status -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Order Status Breakdown</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-md-3">
-                            <h4 class="text-warning">{{ pending_orders }}</h4>
-                            <p>Pending Orders</p>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Revenue Trend</h2>
+                            <p>Daily revenue for the last 7 days.</p>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-info">{{ paid_orders }}</h4>
-                            <p>Paid Orders</p>
+                    </div>
+                    <div class="bar-grid">
+                        {% for entry in daily_revenue %}
+                            <div class="bar-col">
+                                <div class="bar-value">PHP {{ entry.revenue|floatformat:0 }}</div>
+                                <div class="bar" style="height: {{ entry.height }}%;"></div>
+                                <div class="bar-label">{{ entry.label }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Inventory Watch</h2>
+                            <p>Spot products that need restocking before they hurt sales.</p>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-primary">{{ shipped_orders }}</h4>
-                            <p>Shipped Orders</p>
+                        <span class="pill {% if out_of_stock_count %}pill-danger{% endif %}">
+                            {{ out_of_stock_count }} out of stock
+                        </span>
+                    </div>
+                    <div class="mini-list">
+                        <div class="mini-list-item">
+                            <div>
+                                <strong>Total products</strong>
+                                <div class="muted-copy">Visible across the store</div>
+                            </div>
+                            <span class="pill">{{ total_products }}</span>
                         </div>
-                        <div class="col-md-3">
-                            <h4 class="text-success">{{ delivered_orders }}</h4>
-                            <p>Delivered Orders</p>
+                        <div class="mini-list-item">
+                            <div>
+                                <strong>Low stock products</strong>
+                                <div class="muted-copy">Items with less than 10 units left</div>
+                            </div>
+                            <span class="pill">{{ low_stock_count }}</span>
+                        </div>
+                        {% for product in low_stock_products %}
+                            <div class="mini-list-item">
+                                <div>
+                                    <strong>{{ product.name }}</strong>
+                                    <div class="muted-copy">{{ product.category.name }} · {{ product.get_unit_display }}</div>
+                                </div>
+                                <span class="pill {% if product.stock_quantity <= 0 %}pill-danger{% endif %}">
+                                    {{ product.stock_quantity }} left
+                                </span>
+                            </div>
+                        {% empty %}
+                            <p class="empty-state">All available products currently have healthy stock levels.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-lg-6">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Best Selling Products</h2>
+                            <p>Your strongest movers based on quantity sold.</p>
+                        </div>
+                    </div>
+                    {% if best_sellers %}
+                        <div class="table-responsive">
+                            <table class="table data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Units Sold</th>
+                                        <th>Sales Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in best_sellers %}
+                                        <tr>
+                                            <td>{{ item.best_seller_name }}</td>
+                                            <td>{{ item.total_sold }}</td>
+                                            <td>PHP {{ item.revenue|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="empty-state">No sales data yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Payments and Fulfillment</h2>
+                            <p>Quick view of how customers pay and receive orders.</p>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <div class="mini-list">
+                                {% for item in payment_breakdown %}
+                                    <div class="mini-list-item">
+                                        <strong>{{ item.label }}</strong>
+                                        <span class="pill">{{ item.count }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="empty-state">No payment data yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mini-list">
+                                {% for item in fulfillment_breakdown %}
+                                    <div class="mini-list-item">
+                                        <strong>{{ item.label }}</strong>
+                                        <span class="pill">{{ item.count }}</span>
+                                    </div>
+                                {% empty %}
+                                    <p class="empty-state">No fulfillment data yet.</p>
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Best Sellers -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">🏆 Best Selling Products</h5>
+
+        <div class="dashboard-panel mt-4">
+            <div class="panel-head">
+                <div>
+                    <h2>Top Customers</h2>
+                    <p>Customers contributing the most repeat business.</p>
                 </div>
-                <div class="card-body">
-                    {% if best_sellers %}
-                        <table class="table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Sold</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in best_sellers %}
+            </div>
+            {% if top_customers %}
+                <div class="customer-grid">
+                    {% for customer in top_customers %}
+                        <div class="customer-card">
+                            <strong>{{ customer.full_name|default:customer.username }}</strong>
+                            <div class="muted-copy">@{{ customer.username }}</div>
+                            <div class="muted-copy">{{ customer.email }}</div>
+                            <div class="mt-3">Orders: <strong>{{ customer.order_count }}</strong></div>
+                            <div>Total spent: <strong>PHP {{ customer.total_spent|floatformat:2 }}</strong></div>
+                            <div class="muted-copy mt-2">{{ customer.contact_number }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Customer insights will appear after the first orders come in.</p>
+            {% endif %}
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-lg-7">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Recent Orders</h2>
+                            <p>Latest transactions that may need action from the team.</p>
+                        </div>
+                    </div>
+                    {% if recent_orders %}
+                        <div class="table-responsive">
+                            <table class="table data-table">
+                                <thead>
                                     <tr>
-                                        <td>{{ item.product.name }}</td>
-                                        <td><span class="badge bg-success">{{ item.total_sold }}</span></td>
+                                        <th>Order</th>
+                                        <th>Customer</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                        <th>Created</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for order in recent_orders %}
+                                        <tr>
+                                            <td>{{ order.order_code }}</td>
+                                            <td>{{ order.user.username }}</td>
+                                            <td>{{ order.get_status_display }}</td>
+                                            <td>PHP {{ order.total_price|floatformat:2 }}</td>
+                                            <td>{{ order.created_at|date:"M d, Y g:i A" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     {% else %}
-                        <p class="text-muted">No sales data yet</p>
+                        <p class="empty-state">No orders yet.</p>
                     {% endif %}
                 </div>
             </div>
-        </div>
-        
-        <!-- Low Stock Alert -->
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">⚠️ Low Stock Alert</h5>
+            <div class="col-lg-5">
+                <div class="dashboard-panel h-100">
+                    <div class="panel-head">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Jump into the admin tools you will use most often.</p>
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/admin/" class="btn-primary-custom">Open Admin</a>
+                        <a href="/admin/orders_app/order/" class="btn btn-outline-success">Manage Orders</a>
+                        <a href="/admin/products_app/product/" class="btn btn-outline-success">Manage Products</a>
+                        <a href="/admin/accounts_app/profile/" class="btn btn-outline-success">Manage Users</a>
+                        <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">View Storefront</a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    {% if low_stock_products %}
-                        <table class="table">
-                            <thead class="table-light">
+            </div>
+        </div>
+
+        <div class="dashboard-panel mt-4">
+            <div class="panel-head">
+                <div>
+                    <h2>Account Directory</h2>
+                    <p>Staff and customer account visibility for follow-ups and support.</p>
+                </div>
+            </div>
+            {% if users %}
+                <div class="table-responsive">
+                    <table class="table data-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Contact</th>
+                                <th>Orders</th>
+                                <th>Total Spent</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for account in users %}
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Stock</th>
+                                    <td>
+                                        <strong>{{ account.full_name }}</strong><br>
+                                        <span class="muted-copy">@{{ account.username }} · {{ account.email }}</span>
+                                    </td>
+                                    <td>
+                                        {% if account.is_superuser %}
+                                            <span class="pill">Superuser</span>
+                                        {% elif account.is_staff %}
+                                            <span class="pill">Staff</span>
+                                        {% else %}
+                                            <span class="pill">{{ account.role }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ account.contact_number }}</td>
+                                    <td>{{ account.order_count }}</td>
+                                    <td>PHP {{ account.total_spent|floatformat:2 }}</td>
+                                    <td>{{ account.date_joined|date:"M d, Y" }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for product in low_stock_products %}
-                                    <tr class="{% if product.stock_quantity == 0 %}table-danger{% else %}table-warning{% endif %}">
-                                        <td>{{ product.name }}</td>
-                                        <td><strong>{{ product.stock_quantity }}</strong></td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-success">All products have sufficient stock!</p>
-                    {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            {% else %}
+                <p class="empty-state">No account data available.</p>
+            {% endif %}
         </div>
     </div>
-    
-    <!-- Quick Actions -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">Quick Actions</h5>
-                </div>
-                <div class="card-body">
-                    <a href="/admin/" class="btn btn-success me-2">Manage Products</a>
-                    <a href="/admin/orders_app/order/" class="btn btn-success me-2">View Orders</a>
-                    <a href="/admin/accounts_app/profile/" class="btn btn-success me-2">Manage Users</a>
-                    <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary">Back to Store</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}

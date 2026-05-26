@@ -48,6 +48,7 @@ If you deploy this project on Vercel, do not rely on `db.sqlite3` for admin or o
    - `DEBUG=False`
    - `DATABASE_URL`
    - `ALLOWED_HOSTS=.vercel.app`
+   - Optional for media uploads on production: `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
 3. Redeploy the app.
 4. Run migrations against the production database:
 
@@ -57,3 +58,21 @@ python fruit_store/manage.py create_sample_data
 ```
 
 If you want the admin dashboard to work on Vercel, `DATABASE_URL` must point to a writable PostgreSQL database.
+
+### Suggested Vercel Project Settings
+
+- Framework preset: `Other`
+- Root directory: `fruit_store`
+- Build command:
+
+```bash
+python manage.py migrate --noinput && STATIC_ROOT=.vercel_static python manage.py collectstatic --noinput
+```
+
+- Output directory: leave blank
+
+### Notes
+
+- Static files are served through WhiteNoise after `collectstatic`.
+- Uploaded media should use Cloudinary in production, because Vercel's filesystem is not persistent for runtime uploads.
+- Vercel preview and production hostnames are accepted automatically through `VERCEL_URL` and related environment variables.

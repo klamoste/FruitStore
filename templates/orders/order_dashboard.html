@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Order Operations - SOFIA'S FRUIT STORE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ops-shell {
+        padding: 2.25rem 0 4rem;
+        background:
+            radial-gradient(circle at top right, rgba(45, 122, 90, 0.12), transparent 22%),
+            linear-gradient(180deg, #f5faf7 0%, #ffffff 45%);
+    }
+    .ops-card {
+        border: 1px solid rgba(31, 85, 64, 0.09);
+        border-radius: 1.4rem;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 18px 45px rgba(31, 85, 64, 0.08);
+    }
+    .ops-toolbar,
+    .ops-order-card {
+        padding: 1.4rem;
+    }
+    .ops-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1rem;
+    }
+    .ops-section {
+        margin-bottom: 1.5rem;
+    }
+    .ops-section-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    .ops-section-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #17392d;
+    }
+    .ops-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin: 0.75rem 0 1rem;
+    }
+    .ops-pill {
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        background: rgba(45, 122, 90, 0.1);
+        color: #1f5540;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+    .ops-priority-high { background: rgba(220, 38, 38, 0.12); color: #b42318; }
+    .ops-priority-medium { background: rgba(245, 158, 11, 0.16); color: #a16207; }
+    .ops-priority-low { background: rgba(59, 130, 246, 0.12); color: #1d4ed8; }
+    .ops-copy {
+        color: #62756a;
+    }
+    .ops-form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.85rem;
+    }
+    .ops-form-grid > div:last-child {
+        grid-column: span 2;
+    }
+    .ops-action-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+        width: 100%;
+    }
+    .ops-action-buttons .btn,
+    .ops-action-buttons button {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.75rem 1rem;
+    }
+    .ops-form-grid input,
+    .ops-form-grid select,
+    .ops-form-grid textarea {
+        border-radius: 0.9rem;
+    }
+    @media (max-width: 768px) {
+        .ops-shell {
+            padding-top: 1.2rem;
+        }
+        .ops-form-grid {
+            grid-template-columns: 1fr;
+        }
+        .ops-form-grid > div:last-child {
+            grid-column: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="ops-shell">
+    <div class="container-xl">
+        <div class="ops-card ops-toolbar mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+                <div>
+                    <div class="ops-pill">{{ dashboard_badge }}</div>
+                    <h1 class="mt-3 mb-2" style="font-weight: 800; color: #17392d;">{{ dashboard_title }}</h1>
+                    <p class="ops-copy mb-0">{{ dashboard_intro }}</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if dashboard_title == 'Delivered Orders' %}
+                    <a href="{{ owner_link_href }}" class="btn btn-outline-success">{{ owner_link_label }}</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form method="get" class="row g-3 mt-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Search</label>
+                    <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Order code, customer">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select class="form-select" name="status">
+                        <option value="">All statuses</option>
+                        {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Fulfillment</label>
+                    <select class="form-select" name="fulfillment">
+                        <option value="">All fulfillment types</option>
+                        {% for value, label in fulfillment_choices %}
+                        <option value="{{ value }}" {% if fulfillment_filter == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Filter Queue</button>
+                </div>
+            </form>
+        </div>
+
+        {% if grouped_orders %}
+        {% for group in grouped_orders %}
+        <div class="ops-section">
+            <div class="ops-section-head">
+                <h2 class="ops-section-title">{{ group.title }}</h2>
+                <span class="ops-pill">{{ group.count }} order{{ group.count|pluralize }}</span>
+            </div>
+            <div class="ops-grid">
+            {% for order in group.orders %}
+            <div class="ops-card ops-order-card">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h3 style="font-size: 1.15rem; font-weight: 800; color: #17392d; margin-bottom: 0.2rem;">{{ order.order_code }}</h3>
+                        <div class="ops-copy">{{ order.user.get_full_name|default:order.user.username }}</div>
+                    </div>
+                    {% if show_priority %}
+                    <span class="ops-pill {% if order.priority_badge == 'High' %}ops-priority-high{% elif order.priority_badge == 'Medium' %}ops-priority-medium{% else %}ops-priority-low{% endif %}">
+                        {{ order.priority_badge }} Priority
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="ops-meta">
+                    <span class="ops-pill">{{ order.get_status_display }}</span>
+                    <span class="ops-pill">{{ order.get_fulfillment_method_display }}</span>
+                    <span class="ops-pill">{{ order.get_payment_method_display }}</span>
+                    <span class="ops-pill">{{ order.item_count }} item{{ order.item_count|pluralize }}</span>
+                </div>
+
+                <div class="ops-copy mb-2">Scheduled: {{ order.delivery_date|date:"M d, Y"|default:"Not set" }}{% if order.delivery_window %} · {{ order.get_delivery_window_display }}{% endif %}</div>
+                <div class="ops-copy mb-2">Total: <strong>PHP {{ order.total_price }}</strong></div>
+                {% if order.internal_note %}
+                <div class="ops-copy mb-3">Internal note: {{ order.internal_note }}</div>
+                {% endif %}
+
+                {% if order.show_status_form|default:show_status_form %}
+                <form method="post" action="{% url 'orders:update_order_status' order.id %}">
+                    {% csrf_token %}
+                    <div class="ops-form-grid">
+                        <div>
+                            <label class="form-label fw-semibold">Status</label>
+                            <select class="form-select" name="status">
+                                {% for value, label in status_choices %}
+                                <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="assigned_courier" value="{{ order.assigned_courier }}">
+                        <div>
+                            <label class="form-label fw-semibold">Actions</label>
+                            <div class="ops-action-buttons">
+                                <button type="submit" class="btn btn-success">Save Update</button>
+                                <a href="{% url 'orders:order_detail' order.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline-secondary">View Order</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">Internal Note</label>
+                        <textarea class="form-control" name="internal_note" rows="3" placeholder="Packing notes, route details, issue follow-up">{{ order.internal_note }}</textarea>
+                    </div>
+                </form>
+                {% else %}
+                <div class="d-grid">
+                    <a href="{% url 'orders:order_detail' order.id %}?next={{ request.get_full_path|urlencode }}" class="btn btn-outline-secondary">View Order</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="ops-card p-4">
+            <h2 style="font-weight: 800; color: #17392d;">{{ empty_title }}</h2>
+            <p class="ops-copy mb-0">{{ empty_copy }}</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

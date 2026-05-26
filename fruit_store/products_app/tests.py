@@ -5,6 +5,7 @@ from django.db import DatabaseError
 from django.test import TestCase
 from django.urls import reverse
 
+from accounts_app.models import Profile
 from .forms import ProductForm
 from .models import Category, Product
 
@@ -124,6 +125,22 @@ class ProductViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'Choose Cup Size')
         self.assertContains(response, 'per cup')
+
+    def test_admin_preview_hides_purchase_controls(self):
+        product = Product.objects.get(name='Apple')
+        admin_user = User.objects.create_user(username='adminpreview', password='secret123', is_staff=True)
+        Profile.objects.create(user=admin_user, role='admin')
+        self.client.force_login(admin_user)
+
+        response = self.client.get(
+            reverse('products:product_detail', args=[product.id]),
+            secure=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Admin preview only')
+        self.assertNotContains(response, 'Add to Cart')
+        self.assertNotContains(response, reverse('products:add_to_cart', args=[product.id]))
 
     def test_product_form_uses_single_price_field_for_cup_products(self):
         form = ProductForm()

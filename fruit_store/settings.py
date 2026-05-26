@@ -28,6 +28,16 @@ def env_flag(name, default=False):
     return default
 
 
+def env_int(name, default):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    try:
+        return int(value.strip())
+    except (TypeError, ValueError):
+        return default
+
+
 def get_database_url():
     value = os.environ.get('DATABASE_URL', '').strip()
     if not value:
@@ -53,15 +63,19 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-v8no#t_4*=4yz&ug-*u8-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_flag('DEBUG', default=True)
 VERCEL_ENV = os.environ.get('VERCEL') == '1'
+vercel_url = os.environ.get('VERCEL_URL')
+vercel_project_production_url = os.environ.get('VERCEL_PROJECT_PRODUCTION_URL')
+vercel_branch_url = os.environ.get('VERCEL_BRANCH_URL')
+vercel_deploy_pr_url = os.environ.get('VERCEL_DEPLOY_PRIME_URL')
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver', '.vercel.app']
 render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_hostname:
     ALLOWED_HOSTS.append(render_hostname)
 
-vercel_url = os.environ.get('VERCEL_URL')
-if vercel_url:
-    ALLOWED_HOSTS.append(vercel_url)
+for host in (vercel_url, vercel_project_production_url, vercel_branch_url, vercel_deploy_pr_url):
+    if host:
+        ALLOWED_HOSTS.append(host)
 
 extra_hosts = os.environ.get('ALLOWED_HOSTS', '')
 if extra_hosts:
@@ -70,8 +84,15 @@ if extra_hosts:
 CSRF_TRUSTED_ORIGINS = []
 if render_hostname:
     CSRF_TRUSTED_ORIGINS.append(f'https://{render_hostname}')
-if vercel_url:
-    CSRF_TRUSTED_ORIGINS.append(f'https://{vercel_url}')
+for host in (vercel_url, vercel_project_production_url, vercel_branch_url, vercel_deploy_pr_url):
+    if host:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{host}')
+
+extra_csrf_origins = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if extra_csrf_origins:
+    CSRF_TRUSTED_ORIGINS.extend(
+        [origin.strip() for origin in extra_csrf_origins.split(',') if origin.strip()]
+    )
 
 
 # Application definition
@@ -178,7 +199,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = Path(os.environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles'))
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STORAGES = {
     'default': {
@@ -227,17 +248,29 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 STORE_GCASH_NAME = os.environ.get('STORE_GCASH_NAME', '').strip()
 STORE_GCASH_NUMBER = os.environ.get('STORE_GCASH_NUMBER', '').strip()
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'no-reply@fruitstore.local').strip()
+STORE_NOTIFICATION_EMAIL = os.environ.get('STORE_NOTIFICATION_EMAIL', '').strip()
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 force_https = env_flag('SECURE_SSL_REDIRECT', default=False)
-is_hosted_environment = bool(render_hostname or vercel_url or VERCEL_ENV)
+is_hosted_environment = bool(
+    render_hostname
+    or vercel_url
+    or vercel_project_production_url
+    or vercel_branch_url
+    or vercel_deploy_pr_url
+    or VERCEL_ENV
+)
 if not DEBUG and (force_https or is_hosted_environment):
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = env_int('SECURE_HSTS_SECONDS', 60 * 60 * 24 * 30)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env_flag('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=True)
+    SECURE_HSTS_PRELOAD = env_flag('SECURE_HSTS_PRELOAD', default=False)
 
 # Messages
 from django.contrib.messages import constants as messages
