@@ -3,6 +3,11 @@
   "version": 2,
   "buildCommand": "python manage.py migrate --noinput && STATIC_ROOT=.vercel_static python manage.py collectstatic --noinput",
   "outputDirectory": ".vercel_static",
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "{fruit_store/**,templates/**,.vercel_static/**,db.sqlite3}"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
