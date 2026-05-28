@@ -15,6 +15,11 @@ python -m pip install -r "$PROJECT_DIR/requirements.txt"
 echo "Dependencies installed"
 echo
 
+export DATABASE_URL=
+export USE_DATABASE_URL=
+export VERCEL_USE_POSTGRES=
+export VERCEL=
+
 echo "Step 2: Running migrations..."
 python manage.py migrate --noinput
 echo "Database initialized"

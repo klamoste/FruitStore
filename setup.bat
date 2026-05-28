@@ -15,6 +15,11 @@ pip install -r "%PROJECT_DIR%\requirements.txt" > nul 2>&1
 echo Dependencies installed
 echo.
 
+set "DATABASE_URL="
+set "USE_DATABASE_URL="
+set "VERCEL_USE_POSTGRES="
+set "VERCEL="
+
 echo Step 2: Running migrations...
 python manage.py migrate --noinput > nul 2>&1
 echo Database initialized
